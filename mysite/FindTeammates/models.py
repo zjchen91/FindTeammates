@@ -35,8 +35,8 @@ not sure how we get sender, receiver and team
 not sure type is completed
 '''
 class Message(models.Model):
-	senderID = models.ForeignKey(Student)
-	receiverID = models.ForeignKey(Student)
+	senderID = models.ForeignKey(Student, related_name='sender')
+	receiverID = models.ForeignKey(Student, related_name='receiver')
 	'''
 	messageType:
 	0: default
@@ -70,8 +70,8 @@ database optimize:
 1. index
 '''
 class teamInviteStuHistory(models.Model):
-	inviterID = models.ForeignKey(Student)
-	inviteeID = models.ForeignKey(Student)
+	inviterID = models.ForeignKey(Student, related_name='inviter')
+	inviteeID = models.ForeignKey(Student, related_name='invitee')
 
 class stuJoinTeamHistory(models.Model):
 	joinerID = models.ForeignKey(Student)
