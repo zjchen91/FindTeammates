@@ -74,8 +74,9 @@ def site(request):
 
 def teams(request):
 	current_id = 17
+	current_course_id = 1
 	stpair = student_team.objects.all()
-	teamObjectList = Team.objects.all()
+	teamObjectList = Team.objects.all().filter(courseID=current_course_id)
 	allteam = []
 	for team in teamObjectList:
 		allteam.append(str(team.id))
