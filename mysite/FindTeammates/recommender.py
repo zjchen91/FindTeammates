@@ -144,7 +144,7 @@ class recommander:
 		for item in rank:
 			ranklist.append(item[0])
 		for item in self.alldata:
-			if item not in ranklist and item != self.userID:
+			if (item not in ranklist) and (item != self.userID):
 				ranklist.append(item)
 		return ranklist
 

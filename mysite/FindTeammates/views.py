@@ -37,13 +37,13 @@ def roster(request):
 	alluser = []
 	for stu in studentObjectList:
 		alluser.append(str(stu.id))
+	print alluser
 	template = loader.get_template('FindTeammates/roster.html')
 	# see whether current user is in a team or not
 	# in a team
 	if len(stpair.filter(studentID=current_id)) != 0:
 
 		preferuser = {}
-		alluser = []
 		inviteHis = teamInviteStuHistory.objects.all()
 		for invite in inviteHis:
 			ter = str(invite.inviterID.id)
@@ -55,6 +55,7 @@ def roster(request):
 
 		test = recommander(str(current_id), 'team', preferuser, alluser)
 		ranklist = test.run()
+		print ranklist
 		studentObjectList = []
 		for item in ranklist:
 			studentObjectList.append(Student.objects.get(id=int(item)))
@@ -81,7 +82,6 @@ def teams(request):
 		return HttpResponse(template.render(context))
 	else:
 		preferteam = {}
-		allteam = []
 		joinHis = stuJoinTeamHistory.objects.all()
 		for join in joinHis:
 			ner = str(join.joinerID.id)
