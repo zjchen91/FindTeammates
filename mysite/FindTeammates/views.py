@@ -37,7 +37,6 @@ def roster(request):
 	alluser = []
 	for stu in studentObjectList:
 		alluser.append(str(stu.id))
-	print alluser
 	template = loader.get_template('FindTeammates/roster.html')
 	# see whether current user is in a team or not
 	# in a team
@@ -55,7 +54,6 @@ def roster(request):
 
 		test = recommander(str(current_id), 'team', preferuser, alluser)
 		ranklist = test.run()
-		print ranklist
 		studentObjectList = []
 		for item in ranklist:
 			studentObjectList.append(Student.objects.get(id=int(item)))
@@ -158,30 +156,26 @@ def login(request):
 
 
 def updateInviteHistory(request):
-
+	current_id = 1
 	if request.POST.has_key('client_response'):
-		print 'shit'
-		x = request.POST['client_response']
-		'''
-		TODO:
-		update invite history in database
-		'''
-		print x
+		inviteeID = request.POST['client_response']
+		inviter = Student.objects.get(id=current_id)
+		invitee = Student.objects.get(id=inviteeID)
+		his = teamInviteStuHistory(inviterID=inviter, inviteeID=invitee)
+		his.save()
 		
 		return render_to_response('FindTeammates/roster.html', context_instance=RequestContext(request))
 	else:
 		return render_to_response('FindTeammates/roster.html', context_instance=RequestContext(request))
 
 def updateJoinHistory(request):
-
+	current_id = 1
 	if request.POST.has_key('client_response'):
-		print 'shit'
-		x = request.POST['client_response']
-		'''
-		TODO:
-		update join history in database
-		'''
-		print x
+		jointeamID = request.POST['client_response']
+		joiner = Student.objects.get(id=current_id)
+		jointeam = Team.objects.get(id=jointeamID)
+		his = stuJoinTeamHistory(joinerID=joiner, joineeTeamID=jointeam)
+		his.save()
 		
 		return render_to_response('FindTeammates/teams.html', context_instance=RequestContext(request))
 	else:
