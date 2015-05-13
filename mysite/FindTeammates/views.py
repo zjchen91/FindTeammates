@@ -172,6 +172,7 @@ def updateJoinHistory(request):
 	current_id = 1
 	if request.POST.has_key('client_response'):
 		jointeamID = request.POST['client_response']
+		print jointeamID
 		joiner = Student.objects.get(id=current_id)
 		jointeam = Team.objects.get(id=jointeamID)
 		his = stuJoinTeamHistory(joinerID=joiner, joineeTeamID=jointeam)

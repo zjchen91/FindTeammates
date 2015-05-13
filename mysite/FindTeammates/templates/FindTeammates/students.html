@@ -34,13 +34,13 @@
     {% if student_list.0 %}
         {% for student in student_list %}
         <div class="col-lg-4 col-sm-6 text-center">
-            <img class="img-circle img-responsive img-center" src="http://placehold.it/200x200" alt="">
+            <img class="img-circle img-responsive img-center" src={{ student.image }} alt="">
             <h3>{{ student.name }}</h3>
             <small>{{ student.headline}}</small>
             <p>{{ student.url}}</p>
             <form method="post" name="" >
                 {% csrf_token %}
-                <input id={{ student.id }} name="invite" type="button" value="Invite!"></input>
+                <input id={{ student.id }} name="invite" type="button" class="btn btn-primary btn-large" value="Invite!"></input>
             </form>
         </div>
         {% endfor %}
