@@ -166,15 +166,15 @@ def getTeamId(userID):
 	return 't' + userID
 
 
-
+'''
 
 if __name__ == '__main__':
 	uid = '1'
 	utype = 'user'
-	'''
+	
 	preferuser to record the invite history for each user in the team.
 	preferteam to record the join history for each user not in the team.
-	'''
+	
 	preferuser = {'1':['2', '4', '6'], '2': ['3', '4', '6'], '3':[], '4': ['3'], '5':['2', '4', '3'], '6':['1', '2', '3']}
 	preferteam = {'1':['t1', 't3', 't5'], '2':[], '3': ['t3', 't1'], '4':['t1', 't4'], '5':[], '6':[]}
 	#teamBasedSkillSetOverlap = {}
@@ -183,6 +183,8 @@ if __name__ == '__main__':
 	userBasedSkillSetOverlap = {'1': {'t1' : 5}, '2':{'t2': 3}, '3':{}, '4': {'t1': 3, 't2': 2}, '5':{}, '6':{'t2':3}}
 	test = recommander(uid, utype, preferteam, ['2'])
 	test.run()
+
+'''
 
 
 

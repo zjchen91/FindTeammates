@@ -1,11 +1,29 @@
 {% extends "FindTeammates/base.html" %}
 {% block content %}
+<form id="createform" role="form" action="addNewTeam" method="post">
+	{% csrf_token %}
+	<div class="form-group">
+		<label for="teamName">Team Name</label>
+		<input type="text" name="teamName" class="createinput form-control" id="teamName" placeholder="Enter team name...">
+	</div>
+	<div class="form-group">
+		<label for="tteamDescription">Description</label>
+		<input type="text" name="teamDescription" class="createinput form-control" id="teamDescription" placeholder="Enter team description...">
+	</div>
+	<div class="form-group">
+		<label for="teamSize">Team Name</label>
+		<input type="text" name="teamSize" class="createinput form-control" id="teamSize" placeholder="Enter team size...">
+	</div>
+	<button id="createbutton" type="submit" class="btn btn-primary">Create Team!</button>
+</form>
+<!--            
 <form id="shareform" role="form" action="addNewTeam" method="post">
 	{% csrf_token %}
 	<div class="input-group">
 	  <span class="input-group-addon" id="teamName">Team Name</span>
 	  <input type="text" class="form-control" placeholder="Team Name" aria-describedby="basic-addon1">
 	</div>
+
 
 	<div class="input-group">
 	  <span class="input-group-addon" id="teamDescription">Description</span>
@@ -19,4 +37,5 @@
 
 	<button id="openteam" type="submit" class="btn btn-default">Create Team!</button>
 </form>
+-->
 {% endblock %}

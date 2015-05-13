@@ -24,24 +24,46 @@ from django.template import RequestContext
 import json
 import socket
 from FindTeammates.models import *
+from FindTeammates.recommender import *
 
 
 
 
 
 def roster(request):
-	return render_to_response('FindTeammates/roster.html', context_instance=RequestContext(request))
+	current_id = 1
+	stpair = student_team.objects.all()
+	studentObjectList = Student.objects.all()
+	template = loader.get_template('FindTeammates/roster.html')
+	# see whether current user is in a team or not
+	# in a team
+	if len(stpair.filter(studentID=current_id)) != 0:
+		'''
+		add recommander
+		'''
+		context = RequestContext(request, {'student_list': studentObjectList})
+		return HttpResponse(template.render(context))
+	else:
+		context = RequestContext(request, {'student_list': studentObjectList})
+		return HttpResponse(template.render(context))
+
 
 
 def teams(request):
+	current_id = 1
 	stpair = student_team.objects.all()
+	teamObjectList = Team.objects.all()
+	template = loader.get_template('FindTeammates/teams.html')
+	# in a team
 	if len(stpair.filter(studentID=current_id)) != 0:
-		return render_to_response('FindTeammates/teams.html')
+		context = RequestContext(request, {'team_list': teamObjectList})
+		return HttpResponse(template.render(context))
 	else:
 		'''
 		DO recommander
 		'''
-		return render_to_response('FindTeammates/teams.html')
+		context = RequestContext(request, {'team_list': teamObjectList})
+		return HttpResponse(template.render(context))
 	
 def login(request):
 	
@@ -136,20 +158,23 @@ def openTeam(request):
 
 
 def addNewTeam(request):
-	current_id = '1'
-	current_course_id = '1'
+	current_id = 1
+	current_course_id = 1
+
 	team_name = request.POST.get("teamName", "")
 	description = request.POST.get("teamDescription", "")
 	teamSize = request.POST.get("teamSize", "")
-	print team_name
-	print description
-	print teamSize
-	team = Team(teamName=team_name, teamDescription=description, Size=teamSize, ownerID=current_id, \
-		courseID=current_course_id)
+	stu = Student.objects.get(id=current_id)
+	course = Course.objects.get(id=current_course_id)
+
+	team = Team(teamName=team_name, teamDescription=description, Size=teamSize, ownerID=stu, courseID=course)
+	
 	team.save()
-	stu_team = student_team(studentID=current_id, teamID=team.id)
+	
+	stu_team = student_team(studentID=stu, teamID=team)
 	stu_team.save()
 	return render_to_response('FindTeammates/teams.html')
+	
 
 
 
