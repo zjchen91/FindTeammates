@@ -3,6 +3,10 @@ from django.db import models
 
 class Student(models.Model):
 	name = models.CharField(max_length=100)
+	skill = models.CharField(max_length=1000)
+	image = models.CharField(max_length=1000)
+	url = models.CharField(max_length=1000)
+	headline = models.CharField(max_length=1000)
 	'''
 	attributes from linkedin
 	'''
