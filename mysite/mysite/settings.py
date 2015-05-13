@@ -60,10 +60,10 @@ WSGI_APPLICATION = 'mysite.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'test',
-        'USER': 'root',
-        'PASSWORD': '111111',
-        'HOST': 'localhost',
+        'NAME': 'findteammates',
+        'USER': 'yw2684',
+        'PASSWORD': 'njdx3119',
+        'HOST': 'twittmapywang.c5qwjbjd9syy.us-east-1.rds.amazonaws.com',
         'PORT': '3306',
     }
 }
