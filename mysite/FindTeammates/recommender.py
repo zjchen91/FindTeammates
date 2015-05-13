@@ -43,11 +43,12 @@ class recommander:
 	oldTeammates = []
 	
 
-	def __init__(self, uid, utype, preferDataSet, oldTeammates):
+	def __init__(self, uid, utype, preferDataSet, alldata):
 		self.userID = uid
 		self.userType = utype
 		self.preferDataSet = preferDataSet
-		self.oldTeammates = oldTeammates
+		self.alldata = alldata
+		#self.oldTeammates = oldTeammates
 
 
 	# preferDataSet: {id: [ids id endorsed]} for user in team
@@ -72,7 +73,6 @@ class recommander:
 			self.W.setdefault(i,{})
 			for j,cij in related_items.items():
 				self.W[i][j] = cij / (math.sqrt(N[i] * N[j]))
-		#print C
 
 	def CFScore(self):
 		self.rankCF = dict()
@@ -84,9 +84,10 @@ class recommander:
 				self.rankCF.setdefault(j,0)
 				self.rankCF[j] += (100 - i) * wj
 		self.rankCF = normalize(self.rankCF)
+
 		# normalize self.rankCF
 		#return dict(sorted(self.rankCF.items(),key=lambda x:x[1],reverse=True))
-
+	'''
 	def skillSetScore(self):
 		global teamBasedSkillSetOverlap
 		global userBasedSkillSetOverlap
@@ -122,30 +123,40 @@ class recommander:
 				self.rankOT.setdefault(teamID, weight)
 				self.rankOT[teamID] += weight
 			self.rankOT = normalize(self.rankOT)
+	'''
 
 	def recommend(self):
 		rank = {}
 		for user in self.rankCF:
 			rank.setdefault(user, 0)
 			rank[user] += self.rankCF[user]
+		'''
 		for user in self.rankSS:
 			rank.setdefault(user, 0)
 			rank[user] += self.rankSS[user]
+		
 		for user in self.rankOT:
 			rank.setdefault(user, 0)
 			rank[user] += self.rankOT[user]
-		rank = dict(sorted(rank.items(),key=lambda x:x[1],reverse=True))
-		return rank
+		'''
+		rank = sorted(rank.items(),key=lambda x:x[1],reverse=True)
+		ranklist = []
+		for item in rank:
+			ranklist.append(item[0])
+		for item in self.alldata:
+			if item not in ranklist and item != self.userID:
+				ranklist.append(item)
+		return ranklist
 
 	def run(self):
 		self.itemBasedCF()
 		self.CFScore()
-		print 'CF:', self.rankCF
-		self.skillSetScore()
-		print 'skill:', self.rankSS
-		self.oldTeammatesScore(10)
-		print 'old:', self.rankOT
-		print self.recommend()
+		#print 'CF:', self.rankCF
+		#self.skillSetScore()
+		#print 'skill:', self.rankSS
+		#self.oldTeammatesScore(10)
+		#print 'old:', self.rankOT
+		return self.recommend()
 
 
 
@@ -166,25 +177,24 @@ def getTeamId(userID):
 	return 't' + userID
 
 
-'''
 
+'''
 if __name__ == '__main__':
 	uid = '1'
-	utype = 'user'
-	
-	preferuser to record the invite history for each user in the team.
-	preferteam to record the join history for each user not in the team.
+	utype = 'team'
 	
 	preferuser = {'1':['2', '4', '6'], '2': ['3', '4', '6'], '3':[], '4': ['3'], '5':['2', '4', '3'], '6':['1', '2', '3']}
+	#preferuser = {'1':['2', '3'], '3': ['2', '1'], '2':['3', '1']}
 	preferteam = {'1':['t1', 't3', 't5'], '2':[], '3': ['t3', 't1'], '4':['t1', 't4'], '5':[], '6':[]}
 	#teamBasedSkillSetOverlap = {}
 	#userBasedSkillSetOverlap = {}
 	teamBasedSkillSetOverlap = {'t1': {'4': 3}, 't2': {'4': 2, '6': 3}}
 	userBasedSkillSetOverlap = {'1': {'t1' : 5}, '2':{'t2': 3}, '3':{}, '4': {'t1': 3, 't2': 2}, '5':{}, '6':{'t2':3}}
-	test = recommander(uid, utype, preferteam, ['2'])
-	test.run()
-
+	test = recommander(uid, utype, preferuser)
+	print test.run()
 '''
+
+
 
 
 

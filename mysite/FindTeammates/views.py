@@ -34,13 +34,31 @@ def roster(request):
 	current_id = 1
 	stpair = student_team.objects.all()
 	studentObjectList = Student.objects.all()
+	alluser = []
+	for stu in studentObjectList:
+		alluser.append(str(stu.id))
 	template = loader.get_template('FindTeammates/roster.html')
 	# see whether current user is in a team or not
 	# in a team
 	if len(stpair.filter(studentID=current_id)) != 0:
-		'''
-		add recommander
-		'''
+
+		preferuser = {}
+		alluser = []
+		inviteHis = teamInviteStuHistory.objects.all()
+		for invite in inviteHis:
+			ter = str(invite.inviterID.id)
+			tee = str(invite.inviteeID.id)
+			if ter in preferuser:
+				preferuser[ter].append(tee)
+			else:
+				preferuser[ter] = [tee]
+
+		test = recommander(str(current_id), 'team', preferuser, alluser)
+		ranklist = test.run()
+		studentObjectList = []
+		for item in ranklist:
+			studentObjectList.append(Student.objects.get(id=int(item)))
+
 		context = RequestContext(request, {'student_list': studentObjectList})
 		return HttpResponse(template.render(context))
 	else:
@@ -53,15 +71,31 @@ def teams(request):
 	current_id = 1
 	stpair = student_team.objects.all()
 	teamObjectList = Team.objects.all()
+	allteam = []
+	for team in teamObjectList:
+		allteam.append(str(team.id))
 	template = loader.get_template('FindTeammates/teams.html')
 	# in a team
 	if len(stpair.filter(studentID=current_id)) != 0:
 		context = RequestContext(request, {'team_list': teamObjectList})
 		return HttpResponse(template.render(context))
 	else:
-		'''
-		DO recommander
-		'''
+		preferteam = {}
+		allteam = []
+		joinHis = stuJoinTeamHistory.objects.all()
+		for join in joinHis:
+			ner = str(join.joinerID.id)
+			nee = str(join.joineeTeamID.id)
+			if ner in preferteam:
+				preferteam[ner].append(nee)
+			else:
+				preferteam[ner] = [nee]
+
+		test = recommander(str(current_id), 'team', preferteam, allteam)
+		ranklist = test.run()
+		studentObjectList = []
+		for item in ranklist:
+			teamObjectList.append(Team.objects.get(id=int(item)))
 		context = RequestContext(request, {'team_list': teamObjectList})
 		return HttpResponse(template.render(context))
 	
