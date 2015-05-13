@@ -62,7 +62,7 @@
                     <p>{{ team.teamDescription }}</p>
                     <form method="post" name="" >
                         {% csrf_token %}
-                        <input id={{ team.id }} name="join" type="button" value="Join!"></input>
+                        <input id={{ team.id }} name="join" type="button" class="btn btn-primary btn-large" value="Join!"></input>
                     </form> 
                 </div>
             </div>
