@@ -3,12 +3,13 @@
         $("input[name=invite]").click(function() {
             //var input_string = $("#forminput").val();
             console.log('yay');
+            alert("Sent invitation successfully!");
             $.ajax({
                 url : "../inviteHis", 
                 type : "POST",
                 dataType: "json", 
                 data : {
-                    client_response : "John",
+                    client_response : this.id,
                     csrfmiddlewaretoken: '{{ csrf_token }}'
                     },
                     success : function(json) {
@@ -39,7 +40,7 @@
             <p>{{ student.url}}</p>
             <form method="post" name="" >
                 {% csrf_token %}
-                <button name="invite" type="button" class="btn btn-primary">Invite!</button>
+                <input id={{ student.id }} name="invite" type="button" value="Invite!"></input>
             </form>
         </div>
         {% endfor %}
