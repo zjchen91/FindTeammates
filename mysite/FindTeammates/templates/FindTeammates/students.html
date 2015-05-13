@@ -34,10 +34,10 @@
     {% if student_list.0 %}
         {% for student in student_list %}
         <div class="col-lg-4 col-sm-6 text-center">
-            <img class="img-circle img-responsive img-center" src={{ student.image }} alt="">
-            <h3>{{ student.name }}</h3>
+            <img class="img-circle img-responsive img-center" src={{ student.image }} alt="" height="200" width="200">
+            <h3><a href={{student.url}}}>{{ student.name }}</a></h3>
             <small>{{ student.headline}}</small>
-            <p>{{ student.url}}</p>
+            <small>{{ student.skill}}</small>
             <form method="post" name="" >
                 {% csrf_token %}
                 <input id={{ student.id }} name="invite" type="button" class="btn btn-primary btn-large" value="Invite!"></input>

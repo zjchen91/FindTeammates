@@ -31,7 +31,7 @@ from FindTeammates.recommender import *
 
 
 def roster(request):
-	current_id = 1
+	current_id = 17
 	stpair = student_team.objects.all()
 	studentObjectList = Student.objects.all()
 	alluser = []
@@ -51,7 +51,6 @@ def roster(request):
 				preferuser[ter].append(tee)
 			else:
 				preferuser[ter] = [tee]
-
 		test = recommander(str(current_id), 'team', preferuser, alluser)
 		ranklist = test.run()
 		studentObjectList = []
@@ -71,7 +70,7 @@ def site(request):
 
 
 def teams(request):
-	current_id = 1
+	current_id = 17
 	stpair = student_team.objects.all()
 	teamObjectList = Team.objects.all()
 	allteam = []
@@ -92,7 +91,7 @@ def teams(request):
 				preferteam[ner].append(nee)
 			else:
 				preferteam[ner] = [nee]
-
+		print preferteam
 		test = recommander(str(current_id), 'team', preferteam, allteam)
 		ranklist = test.run()
 		studentObjectList = []
@@ -160,7 +159,7 @@ def login(request):
 
 
 def updateInviteHistory(request):
-	current_id = 1
+	current_id = 17
 	if request.POST.has_key('client_response'):
 		inviteeID = request.POST['client_response']
 		inviter = Student.objects.get(id=current_id)
@@ -173,7 +172,7 @@ def updateInviteHistory(request):
 		return render_to_response('FindTeammates/roster.html', context_instance=RequestContext(request))
 
 def updateJoinHistory(request):
-	current_id = 1
+	current_id = 17
 	if request.POST.has_key('client_response'):
 		jointeamID = request.POST['client_response']
 		print jointeamID
@@ -191,7 +190,7 @@ def openTeam(request):
 
 
 def addNewTeam(request):
-	current_id = 1
+	current_id = 17
 	current_course_id = 1
 
 	team_name = request.POST.get("teamName", "")

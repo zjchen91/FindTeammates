@@ -76,7 +76,11 @@ class recommander:
 
 	def CFScore(self):
 		self.rankCF = dict()
-		items = self.preferDataSet[self.userID]
+		print self.userID
+		try:
+			items = self.preferDataSet[self.userID]
+		except:
+			items = []
 		for i in xrange(len(items)):
 			for j,wj in self.W[items[i]].items():
 				if j in items or j == self.userID:
