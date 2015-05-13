@@ -39,8 +39,7 @@
             <p>{{ student.url}}</p>
             <form method="post" name="" >
                 {% csrf_token %}
-                
-                <input type="button" name="invite" value="Invite"></input>
+                <button name="invite" type="button" class="btn btn-primary">Invite!</button>
             </form>
         </div>
         {% endfor %}
