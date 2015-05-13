@@ -32,11 +32,14 @@ from FindTeammates.recommender import *
 
 def roster(request):
 	current_id = 17
+	current_course_id = 1
+
 	stpair = student_team.objects.all()
-	studentObjectList = Student.objects.all()
+	studentObjectList = student_course.objects.all().filter(courseID=current_course_id)
+	#studentObjectList = Student.objects.all()
 	alluser = []
 	for stu in studentObjectList:
-		alluser.append(str(stu.id))
+		alluser.append(str(stu.studentID.id))
 	template = loader.get_template('FindTeammates/roster.html')
 	# see whether current user is in a team or not
 	# in a team
@@ -205,7 +208,8 @@ def addNewTeam(request):
 	
 	stu_team = student_team(studentID=stu, teamID=team)
 	stu_team.save()
-	return render_to_response('FindTeammates/teams.html')
+	return teams(request)
+	#return render_to_response('FindTeammates/teams.html')
 	
 
 
