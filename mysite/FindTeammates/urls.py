@@ -9,9 +9,9 @@ urlpatterns = [
 
     url(r'^login/$', views.login, name='login'),
 
-
-    url(r'^ajax$', views.ajax, name='ajax'),
-    url(r'^test$', views.main),
     url(r'^inviteHis$', views.updateInviteHistory),
+    url(r'^joinHis$', views.updateJoinHistory),
+    url(r'^openteam$', views.openTeam),
+    url(r'^addNewTeam$', views.addNewTeam),
 
 ]

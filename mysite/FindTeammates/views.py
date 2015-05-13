@@ -5,6 +5,7 @@ from django.shortcuts import render_to_response
 from linkedin import linkedin
 import urllib2
 
+'''
 <<<<<<< HEAD
 API_KEY = '773xw0mljix91p'
 API_SECRET = 'ktG99eRUuMnZ80eW'
@@ -16,20 +17,15 @@ def roster(request):
 
 	return render_to_response('FindTeammates/roster.html')
 =======
+'''
 from django.http import *
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 import json
 import socket
+from FindTeammates.models import *
 
-def LinkedIn_login(request):
-	'''
-	TODO:
-	get the user's ID
-	get the course ID
-	'''
-	context = RequestContext(request, {'request': request, 'user': request.user})
-    return render_to_response('FindTeammates/login.html',context_instance=context)
+
 
 
 
@@ -38,7 +34,14 @@ def roster(request):
 
 
 def teams(request):
-	return render_to_response('FindTeammates/teams.html')
+	stpair = student_team.objects.all()
+	if len(stpair.filter(studentID=current_id)) != 0:
+		return render_to_response('FindTeammates/teams.html')
+	else:
+		'''
+		DO recommander
+		'''
+		return render_to_response('FindTeammates/teams.html')
 	
 def login(request):
 	
@@ -96,8 +99,7 @@ def login(request):
 	'''
 	return render_to_response("FindTeammates/login.html")
 
-def main(request):
-	return render_to_response('FindTeammates/test.html', context_instance=RequestContext(request))
+
 
 def updateInviteHistory(request):
 
@@ -128,6 +130,28 @@ def updateJoinHistory(request):
 		return render_to_response('FindTeammates/teams.html', context_instance=RequestContext(request))
 	else:
 		return render_to_response('FindTeammates/teams.html', context_instance=RequestContext(request))
+
+def openTeam(request):
+	return render_to_response('FindTeammates/openTeam.html', context_instance=RequestContext(request))
+
+
+def addNewTeam(request):
+	current_id = '1'
+	current_course_id = '1'
+	team_name = request.POST.get("teamName", "")
+	description = request.POST.get("teamDescription", "")
+	teamSize = request.POST.get("teamSize", "")
+	print team_name
+	print description
+	print teamSize
+	team = Team(teamName=team_name, teamDescription=description, Size=teamSize, ownerID=current_id, \
+		courseID=current_course_id)
+	team.save()
+	stu_team = student_team(studentID=current_id, teamID=team.id)
+	stu_team.save()
+	return render_to_response('FindTeammates/teams.html')
+
+
 
 
 
