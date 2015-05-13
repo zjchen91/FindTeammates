@@ -6,7 +6,7 @@ urlpatterns = [
     
     url(r'^roster/$', views.roster, name='roster'),
     url(r'^teams/$', views.teams, name='teams'),
-
+	url(r'^site/$', views.site, name='site'),
     url(r'^login/$', views.login, name='login'),
 
     url(r'^inviteHis$', views.updateInviteHistory),

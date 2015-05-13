@@ -67,6 +67,10 @@ def roster(request):
 		return HttpResponse(template.render(context))
 
 
+def site(request):
+	return render_to_response("FindTeammates/site.html")
+
+
 
 def teams(request):
 	current_id = 1
