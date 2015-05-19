@@ -8,7 +8,7 @@ urlpatterns = [
     url(r'^teams/$', views.teams, name='teams'),
 	url(r'^site/$', views.site, name='site'),
     url(r'^login/$', views.login, name='login'),
-
+    url(r'^callback/$', views.callback),
     url(r'^inviteHis$', views.updateInviteHistory),
     url(r'^joinHis$', views.updateJoinHistory),
     url(r'^openteam$', views.openTeam),

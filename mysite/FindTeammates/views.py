@@ -4,7 +4,7 @@ from django.template import RequestContext, loader
 from django.shortcuts import render_to_response
 from linkedin import linkedin
 import urllib2
-
+from cookie import *
 '''
 <<<<<<< HEAD
 API_KEY = '773xw0mljix91p'
@@ -25,7 +25,7 @@ import json
 import socket
 from FindTeammates.models import *
 from FindTeammates.recommender import *
-
+import re
 
 
 
@@ -103,62 +103,97 @@ def teams(request):
 			teamObjectList.append(Team.objects.get(id=int(item)))
 		context = RequestContext(request, {'team_list': teamObjectList})
 		return HttpResponse(template.render(context))
-	
-def login(request):
-	
-	RETURN_URL = 'http://localhost:8000/FindTeammates/'
 
-	authentication = linkedin.LinkedInAuthentication(API_KEY, API_SECRET, RETURN_URL, linkedin.PERMISSIONS.enums.values()[:1])
-	print linkedin.PERMISSIONS.enums.values()[0]
-	print authentication.authorization_url  # open this url on your browser
-	#application = linkedin.LinkedInApplication(authentication)
-	#http://localhost:8000/FindTeammates/?code=AQR5MryHH-PrPjBguVK8suK-4s8FSBip5KIYxTPl0ps1RZY1tsYScut4KsWblKU0vibFLRBav5jlp9d2SNj1PSWUBPX_gX6ZmuYIPzlMwS4RDK6ygzY&state=360a3fc85fede5771d61480973a46f4a
-	#http://localhost:8000/FindTeammates/?code=AQQupO6iTYMJrFuFH3P-EJTsIo9cN6nDi8yj0PArsll41n9WQfVmBQo8y-Hrz2SyMkfAC6mLjNLQG0V__VwZr4npC1sFTlAIku3BtT-KaEP5w9MlRzM&state=0a19199cf14173394df29fc2e682299f
-	#http://localhost:8000/FindTeammates/?code=AQTR9xUM7SuPw5xs4OVTrhjARrXWVPET5WrG3fQaDAgZsB_9HZgdFD_YFOIrn-T2vFs5i9MFGl1ZpbeVeokEyCue2wiEQH1iPILJbSYTqtZx86HUBH4&state=7873719d9118e017c81e7b9df825a6ad
-	code='AQSZCB99ep3gA9hXl9s6aNoT-_dCiO5VzybF17zYiwU3ZvRp7c5Km0ErtyuY3FuYWvalrSHr9rpuUmvKUvfF0evof6FpMAg33Wv0ehKljJJuHZBq9r4'
+# From Enrui, New listening subAddress
+# If I missed something, let me know ASAP.
+# Listen to the server call back, 
+# the linkedin server redirect browser to this addr with the pass code,
+# this code is use to exchange the token
+# with this code, we can get the basic_profile and the url
+# this url is used for my parser,
+# the parser login with an valid linked account and save cookie.
+# so it can open any url of full information
+'''##example information in basic_profile
+{u'headline': u'Student at Columbia University in the City of New York',
+u'lastName': u'Liao', 
+u'siteStandardProfileRequest': {u'url': u'https://www.linkedin.com/profile/view?id=192228977&authType=name&authToken=nnct&trk=api*a3740053*s3809493*'},
+u'id': u'ejEsklXpRl', 
+u'firstName': u'Enrui'}
+'''
+
+def callback(request):
+	code = request.args['code']
 	authentication.authorization_code = code
-	#token=authentication.get_access_token()
-	#application = linkedin.LinkedInApplication(token=token)
-	#url = application.get_profile()
-	url ="https://www.linkedin.com/profile/view?id=334119363&trk=hp-identity-photo"
-	print url
+	t = authentication.get_access_token()
+	linkin_App = linkedin.LinkedInApplication(token=t)
+	# ~~~~~~~~~~~~~~~~~~get token~~~~~~~~~~~~~~~~
+	profile = linkin_App.get_profile()
+	profile_url = profile['siteStandardProfileRequest']['url']
 
-	# create a password manager
-	password_mgr = urllib2.HTTPPasswordMgrWithDefaultRealm()
+	# ~~~~~~~~~~~~~~~~~~~~get info from basic_profile~~~~~~~~~~~~
+	profile_id = profile['id']
+	profile_name = profile['firstName'] + ' ' + profile['lastName']
+	profile_headline = profile['headline']
+	skills = []					# default skills and pic in case the parse fail
+	profile_pic = ''
+	##~~~~~~~~~~ here is the code of parser, or you can call it opener~~~~~~~~~~~
+	with open('account.txt','r') as f:
+		username = f.readline().split('=')[1].strip(' \t"')
+		password = f.readline().split('=')[1].strip(' \t"')
+	parser = LinkedInParser(username, password)
+	res = parser.loadPage(tart)
+	## res contains all the full_profile, here I only parse the skills.
+	## Give me a list of things need to be parsed
+	## ~~~~~~~~~~~here is the code to parse profile_pic~~~~~~~~~~~~~~~
+	try:
+		m = re.findall('"profile-picture".+jpg\' width', res)[0]
+		for i in range(len(m)):
+			n = len("img src='")
+			if m[i:i+n] == "img src='":
+				start = i + n
+				break
+		for i in range(start,len(m)):
+			if m[i] == "'":
+				end = i
+				break
+		profile_pic = m[start:end]
+	except:
+		print "parse profile_pic fail because this account don't have access to the profile_pic"
+	## ~~~~~~~~~~~~~~here is the code of parsing~~~~~~~~~~~~~~~~~~
+	## use regular expression
+	# in the example file you can see a example res I get from result, it's the html
+	# and an regular.py program use re to find all the skills
+	# simply run the program you can see
+	try:
+		skills = re.findall('data-endorsed-item-name="\w+"', res)
+		for i in range(len(skills)):
+			skills[i] = skills[i].split('=')[1].strip('"')
+	except:
+		print "error happened in parsing skills"
+	## ~~~~~~~~~~here is the code of adding data to the database~~~~~~~~~~
+	# I don't know how to add it, this is a dictionary for you.
+	post = {'name':profile_name,		#Enrui Liao
+			'skill':skills,				#['Matlab','Java']
+			'image':profile_pic,		#(str)
+			'url':profile_url,			#(str)
+			'headline':profile_headline	#(str)
+			}
 
-	# Add the username and password.
-	# If we knew the realm, we could use it instead of None.
-	password_mgr.add_password(None, url, USERNAME, PASSWORD)
+	## ~~~~~~~~~~~~~~~~~~response whatever data~~~~~~~~~~~~~~~~~~~~~~~~~~
+	return render_to_response('FindTeammates/roster.html')
 
-	handler = urllib2.HTTPBasicAuthHandler(password_mgr)
+# redirect the browser to Linkedin login page
+def login(request):
+	addr = 'http://localhost:8000/'
+	callback_postfix = 'FindTeammates/callback'
+	API_KEY = '77ivy1b3bzxmlk'
+	API_SECRET = 'yyZCB6IvxBFinBcO'
+	RETURN_URL = addr+ callback_postfix
 
-	# create "opener" (OpenerDirector instance)
-	opener = urllib2.build_opener(handler)
-
-	# use the opener to fetch a URL
-	opener.open(url)
-
-	# Install the opener.
-	# Now all calls to urllib2.urlopen use our opener.
-	urllib2.install_opener(opener)
-	req = urllib2.Request(url)
-	resp = urllib2.urlopen(req)
-	print "----------------"
-	source_code = str(resp.read().decode())
-	print source_code
-	'''
-	i = source_code.find("skill")
-	while i>0:
-		print "yay"
-		i = i+17
-		skill = ""
-		while(not source_code[i]=='"'):
-			skill = skill + source_code[i]
-			i=i+1
-		print skill
-		i = source_code.find("fmt__skill_name")
-	'''
-	return render_to_response("FindTeammates/login.html")
+	permi = linkedin.PERMISSIONS.enums.values()[:1]
+	authentication = linkedin.LinkedInAuthentication(API_KEY, API_SECRET, RETURN_URL, permi)
+	url = authentication.authorization_url	
+	return redirect(url)
 
 
 
