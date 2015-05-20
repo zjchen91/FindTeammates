@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 
 class Student(models.Model):
@@ -7,6 +8,7 @@ class Student(models.Model):
 	image = models.CharField(max_length=1000)
 	url = models.CharField(max_length=1000)
 	headline = models.CharField(max_length=1000)
+	#user = models.OneToOneField(User)
 	'''
 	attributes from linkedin
 	'''

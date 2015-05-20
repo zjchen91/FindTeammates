@@ -13,5 +13,7 @@ urlpatterns = [
     url(r'^joinHis$', views.updateJoinHistory),
     url(r'^openteam$', views.openTeam),
     url(r'^addNewTeam$', views.addNewTeam),
+    url(r'^createCourse$', views.createCourse),
+    url(r'^$', views.roster, name='roster'),
 
 ]
