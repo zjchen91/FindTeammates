@@ -5,7 +5,8 @@ import urllib2
 import re
 import string
 from BeautifulSoup import BeautifulSoup
-
+import os
+import time
 username = "enrui.liao@gmail.com"
 password = "q19890217"
 
@@ -14,6 +15,10 @@ cookie_filename = "parser.cookies.txt"
 class LinkedInParser(object):
 
     def __init__(self, login, password):
+        try:
+            os.remove(cookie_filename)
+        except:
+            1
         """ Start up... """
         self.login = login
         self.password = password
@@ -35,12 +40,10 @@ class LinkedInParser(object):
         ]
         '''
         # Login
-        try:
-            self.loginPage()
-        except:
-            print ''
+        self.loginPage()
+
         title = self.loadTitle()
-        print title
+        
 
         self.cj.save()
 
