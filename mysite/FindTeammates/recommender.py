@@ -76,7 +76,6 @@ class recommander:
 
 	def CFScore(self):
 		self.rankCF = dict()
-		print self.userID
 		try:
 			items = self.preferDataSet[self.userID]
 		except:

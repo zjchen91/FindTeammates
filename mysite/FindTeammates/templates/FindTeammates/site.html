@@ -21,12 +21,13 @@
     <link href="{% static 'FindTeammates/font-awesome/css/font-awesome.min.css' %}" rel="stylesheet" type="text/css">
     <link href="http://fonts.googleapis.com/css?family=Lato:300,400,700,300italic,400italic,700italic" rel="stylesheet" type="text/css">
 
-    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
-    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-    <!--[if lt IE 9]>
-        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
-    <![endif]-->
+    <style>
+      .carousel-inner > .item > img,
+      .carousel-inner > .item > a > img {
+          width: 100%;
+          margin: auto;
+      }
+      </style>
 
 </head>
 
@@ -66,16 +67,15 @@
 
 
     <!-- Header -->
-   <!--  <a name="about"></a> -->
     <div class="intro-header">
         <div class="container">
-
-            <div class="row">
+            <!-- <div class="row">
                 <div class="col-lg-12">
                     <div class="intro-message">
                         <h1>Find Your Teammates</h1>
                         <h3>Great Projects Start Here</h3>
                         <hr class="intro-divider">
+
                         <ul class="list-inline intro-social-buttons">
                             <li>
                                 <a href="/FindTeammates/login" class="btn btn-default btn-lg"><i class="fa fa-linkedin fa-fw"></i> <span class="network-name">Login</span></a>
@@ -84,15 +84,60 @@
                                 <a href="https://github.com/IronSummitMedia/startbootstrap" class="btn btn-default btn-lg"><i class="fa fa-linkedin fa-fw"></i> <span class="network-name">Sign up</span></a>
                             </li>
                         </ul>
+
                     </div>
                 </div>
-            </div>
+            </div> -->
+            <div id="myCarousel" class="carousel slide" data-ride="carousel">
+    <!-- Indicators -->
+    <ol class="carousel-indicators">
+      <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
+      <li data-target="#myCarousel" data-slide-to="1"></li>
+      <li data-target="#myCarousel" data-slide-to="2"></li>
+    </ol>
+
+    <!-- Wrapper for slides -->
+    <div class="carousel-inner" role="listbox">
+      <div class="item active">
+        <img src="{% static 'FindTeammates/img/intro-bg.jpg' %}" alt="Chania" width="500" height="345">
+        <div class="carousel-caption">
+        <h1>Find Your Teammates</h1>
+        <h3>Great Projects Start Here</h3>
+      </div>
+      </div>
+
+      <div class="item">
+        <img src="{% static 'FindTeammates/img/professor.jpg' %}" alt="Chania" width="500" height="345">
+        <div class="carousel-caption">
+        <h1>Easy for Professor</h1>
+        <h3>Great Web Application</h3>
+      </div>
+      </div>
+    
+      <div class="item">
+        <img src="{% static 'FindTeammates/img/students.jpg' %}" alt="Flower" width="500" height="345">
+        <div class="carousel-caption">
+        <h1>A Lifesaver for Students</h1>
+        <h3>Find the Right Teammates Matters A Lot</h3>
+      </div>
+      </div>
+
+      
+    </div>
+
+    <!-- Left and right controls -->
+    <a class="left carousel-control" href="#myCarousel" role="button" data-slide="prev">
+      <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+      <span class="sr-only">Previous</span>
+    </a>
+    <a class="right carousel-control" href="#myCarousel" role="button" data-slide="next">
+      <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+      <span class="sr-only">Next</span>
+    </a>
+  </div>
 
         </div>
-        <!-- /.container -->
-
-    </div>
-    <!-- /.intro-header -->
+    </div><!-- /.intro-header -->
 
     <!-- Page Content -->
 
@@ -128,7 +173,7 @@
                     <hr class="section-heading-spacer">
                     <div class="clearfix"></div>
                     <h2 class="section-heading">For Professors:</h2>
-                    <p class="lead">Turn your 2D designs into high quality, 3D product shots in seconds using free Photoshop actions by <a target="_blank" href="http://www.psdcovers.com/">PSDCovers</a>! Visit their website to download some of their awesome, free photoshop actions!</p>
+                    <p class="lead">Login with LinkedIn and register course project. Specify project and team requirement. Keep track of all teams at any time.</p>
                     <ul class="list-inline banner-social-buttons">
                         <li>
                             <a href="/FindTeammates/login" class="btn btn-default btn-lg"><i class="fa fa-linkedin fa-fw"></i> <span class="network-name">Login</span></a>
@@ -140,21 +185,13 @@
                 </div>
                 <div class="col-lg-5 col-sm-pull-6  col-sm-6">
                     <img class="img-responsive" src="{% static 'FindTeammates/img/professor.jpg' %}" alt="">
-
-    <!-- Custom Fonts -->
-    <link href="{% static 'FindTeammates/font-awesome/css/font-awesome.min.css' %}" rel="stylesheet" type="text/css">
-    <link href="http://fonts.googleapis.com/css?family=Lato:300,400,700,300italic,400italic,700italic" rel="stylesheet" type="text/css">
-
-    <!-- HTML5 Shim and Respond.js IE8 support of HTML
                 </div>
             </div>
-
         </div>
-        <!-- /.container -->
-
     </div>
     <!-- /.content-section-b -->
 
+    <a  name="students"></a>
     <div class="content-section-a">
 
         <div class="container">
@@ -164,7 +201,7 @@
                     <hr class="section-heading-spacer">
                     <div class="clearfix"></div>
                     <h2 class="section-heading">For Students:</h2>
-                    <p class="lead">This template features the 'Lato' font, part of the <a target="_blank" href="http://www.google.com/fonts">Google Web Font library</a>, as well as <a target="_blank" href="http://fontawesome.io">icons from Font Awesome</a>.</p>
+                    <p class="lead">Login with LinkedIn and find your course projects. Automatic teammates recommendation based on your skillsets and fellow students' skillsets. Send request to join partial teams or accept others to your team.</p>
                     <ul class="list-inline banner-social-buttons">
                         <li>
                             <a href="/FindTeammates/login" class="btn btn-default btn-lg"><i class="fa fa-linkedin fa-fw"></i> <span class="network-name">Login</span></a>
@@ -185,7 +222,7 @@
     </div>
     <!-- /.content-section-a -->
 
-	<a  name="students"></a>
+	
     <div class="banner">
 
         <div class="container">
@@ -245,7 +282,8 @@
     <script src="js/jquery.js"></script>
 
     <!-- Bootstrap Core JavaScript -->
-    <script src="js/bootstrap.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="{% static 'FindTeammates/js/bootstrap.min.js' %}"></script>
 
 </body>
 
