@@ -14,12 +14,16 @@ import re
 import datetime
 from cookie import *
 from django.contrib.auth import login
+import os.path
+
 
 addr = 'http://localhost:8000/'
 callback_postfix = 'FindTeammates/callback'
 API_KEY = '77ivy1b3bzxmlk'
 API_SECRET = 'yyZCB6IvxBFinBcO'
 RETURN_URL = addr+ callback_postfix
+
+BASE = os.path.dirname(os.path.abspath(__file__))
 
 
 def roster(request):
@@ -163,7 +167,7 @@ def callback(request):
 	skills = []					# default skills and pic in case the parse fail
 	profile_pic = ''
 	##~~~~~~~~~~ here is the code of parser, or you can call it opener~~~~~~~~~~~
-	with open('account.txt','r') as f:
+	with open(os.path.join(BASE, 'account.txt')) as f:
 		username = f.readline().split('=')[1].strip(' \t"')
 		password = f.readline().split('=')[1].strip(' \t"')
 	parser = LinkedInParser(username, password)
