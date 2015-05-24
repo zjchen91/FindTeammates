@@ -14,12 +14,16 @@ import re
 import datetime
 from cookie import *
 from django.contrib.auth import login
+import os.path
+
 
 addr = 'http://localhost:8000/'
 callback_postfix = 'FindTeammates/callback'
 API_KEY = '77ivy1b3bzxmlk'
 API_SECRET = 'yyZCB6IvxBFinBcO'
 RETURN_URL = addr+ callback_postfix
+
+BASE = os.path.dirname(os.path.abspath(__file__))
 
 
 def roster(request):
@@ -41,15 +45,17 @@ def roster(request):
 		current_course_id = courselist[0].id
 		current_course_teams = Team.objects.all().filter(courseID=current_course_id)
 		stpair = student_team.objects.all().filter(teamID__in=current_course_teams)
-		studentObjectList = student_course.objects.all().filter(courseID=current_course_id)
+		studentList = student_course.objects.all().filter(courseID=current_course_id)
 
 		alluser = []
-		for stu in studentObjectList:
+		for stu in studentList:
 			alluser.append(str(stu.studentID.id))
 	
 		# see whether current user is in a team or not
+		in_team = 0
 		# in a team
 		if len(stpair.filter(studentID=current_id)) != 0:
+			in_team = 1
 
 			preferuser = {}
 			inviteHis = teamInviteStuHistory.objects.all()
@@ -64,21 +70,17 @@ def roster(request):
 			ranklist = test.run()
 			studentObjectList = []
 			for item in ranklist:
-				studentObjectList.append(Student.objects.get(id=int(item)))
+				studentObjectList.append((Student.objects.get(id=int(item[0])), item[1]))
 
-			# just for test
-			test = student_course.objects.all().filter(courseID=current_course_id)
-			studentObjectList = Student.objects.all().filter(id__in=test.values('studentID'))
 			
-			context = RequestContext(request, {'student_list': studentObjectList, 'courselist':courselist, 'all_courses':all_courses, 'current_course_id':current_course_id})
+			context = RequestContext(request, {'student_list': studentObjectList, 'courselist':courselist, 'all_courses':all_courses, 'current_course_id':current_course_id, 'in_team':in_team})
 			return HttpResponse(template.render(context))
 		else:
-
-			# just for test
-			test = student_course.objects.all().filter(courseID=current_course_id)
-			studentObjectList = Student.objects.all().filter(id__in=test.values('studentID'))
-			
-			context = RequestContext(request, {'student_list': studentObjectList, 'courselist':courselist, 'all_courses':all_courses, 'current_course_id':current_course_id})
+			studentObjectList = []
+			all_students = Student.objects.all().filter(id__in=studentList.values('studentID')).exclude(id=current_id)
+			for s in all_students:
+				studentObjectList.append((s, 'N/A'))
+			context = RequestContext(request, {'student_list': studentObjectList, 'courselist':courselist, 'all_courses':all_courses, 'current_course_id':current_course_id, 'in_team':in_team})
 			return HttpResponse(template.render(context))
 
 
@@ -87,42 +89,53 @@ def site(request):
 
 
 def teams(request):
-	current_id = 17
-	current_course_id = 1
-	stpair = student_team.objects.all()
-	teamObjectList = Team.objects.all().filter(courseID=current_course_id)
-	allteam = []
-	for team in teamObjectList:
-		allteam.append(str(team.id))
+
 	template = loader.get_template('FindTeammates/teams.html')
-
+	user = request.user
+	current_student = Student.objects.all().get(user=user.id)
+	current_id = current_student.id
 	student_course_list = student_course.objects.filter(studentID=current_id)
-	courselist = []
-	for stu_co in student_course_list:
-		courselist.append(stu_co.courseID)
+	courselist = Course.objects.all().filter(id__in=student_course_list.values('courseID'))
+	all_courses = Course.objects.all().exclude(id__in=courselist.values('id'))
 
-	# in a team
-	if len(stpair.filter(studentID=current_id)) != 0:
-		context = RequestContext(request, {'team_list': teamObjectList,  'courselist':courselist})
+	
+	
+	if len(courselist)==0:
+		context = RequestContext(request, {'team_list': [], 'courselist':[], 'all_courses':all_courses})
 		return HttpResponse(template.render(context))
+
 	else:
-		preferteam = {}
-		joinHis = stuJoinTeamHistory.objects.all()
-		for join in joinHis:
-			ner = str(join.joinerID.id)
-			nee = str(join.joineeTeamID.id)
-			if ner in preferteam:
-				preferteam[ner].append(nee)
-			else:
-				preferteam[ner] = [nee]
-		print preferteam
-		test = recommander(str(current_id), 'team', preferteam, allteam)
-		ranklist = test.run()
-		studentObjectList = []
-		for item in ranklist:
-			teamObjectList.append(Team.objects.get(id=int(item)))
-		context = RequestContext(request, {'team_list': teamObjectList, 'courselist':courselist})
-		return HttpResponse(template.render(context))
+		current_course_id = courselist[0].id
+		stpair = student_team.objects.all()
+		teamList = Team.objects.all().filter(courseID=current_course_id)
+		allteam = []
+		for team in teamList:
+			allteam.append(str(team.id))
+
+		# in a team
+		if len(stpair.filter(studentID=current_id)) != 0:
+			teamObjectList = []
+			for s in teamList:
+				teamObjectList.append((s, 'N/A'))
+			context = RequestContext(request, {'team_list': teamObjectList,  'courselist':courselist, 'all_courses':all_courses,  'current_course_id':current_course_id})
+			return HttpResponse(template.render(context))
+		else:
+			preferteam = {}
+			joinHis = stuJoinTeamHistory.objects.all()
+			for join in joinHis:
+				ner = str(join.joinerID.id)
+				nee = str(join.joineeTeamID.id)
+				if ner in preferteam:
+					preferteam[ner].append(nee)
+				else:
+					preferteam[ner] = [nee]
+			test = recommander(str(current_id), 'team', preferteam, allteam)
+			ranklist = test.run()
+			teamObjectList = []
+			for item in ranklist:
+				teamObjectList.append((Team.objects.get(id=int(item[0])), item[1]))
+			context = RequestContext(request, {'team_list': teamObjectList, 'courselist':courselist, 'all_courses':all_courses,  'current_course_id':current_course_id})
+			return HttpResponse(template.render(context))
 
 
 # From Enrui, New listening subAddress
@@ -163,7 +176,7 @@ def callback(request):
 	skills = []					# default skills and pic in case the parse fail
 	profile_pic = ''
 	##~~~~~~~~~~ here is the code of parser, or you can call it opener~~~~~~~~~~~
-	with open('account.txt','r') as f:
+	with open(os.path.join(BASE, 'account.txt')) as f:
 		username = f.readline().split('=')[1].strip(' \t"')
 		password = f.readline().split('=')[1].strip(' \t"')
 	parser = LinkedInParser(username, password)
@@ -246,7 +259,6 @@ def updateInviteHistory(request):
 	user = request.user
 	current_student = Student.objects.all().get(user=user.id)
 	current_id = current_student.id
-	print "in updateInviteHistory"
 	if request.POST.has_key('client_response'):
 		inviteeID = request.POST['client_response']
 		inviter = Student.objects.get(id=current_id)
@@ -258,21 +270,26 @@ def updateInviteHistory(request):
 		print current_course_id
 		
 		all_teams_in_current_course = Team.objects.all().filter(courseID=current_course_id)
-		inviter_team = student_team.objects.all().filter(studentID=inviter).filter(teamID__in=all_teams_in_current_course.values('id'))
+		inviter_stu_team = student_team.objects.all().filter(studentID=inviter).filter(teamID__in=all_teams_in_current_course.values('id'))
+		inviter_team = Team.objects.all().filter(id__in=inviter_stu_team.values('teamID'))
 		if not len(inviter_team)==1:
 			print "heere1"
 			return None
 		else:
 			print "heere2"
-			message = Message(senderID=inviter, receiverID=invitee, messageType=5, messageStatus=0, content="", teamID=inviter_team[0], date=datetime.datetime.now())
-			message.save()
+			m = Message(senderID=inviter, receiverID=invitee, messageType=5, messageStatus=0, content="", teamID=inviter_team[0], date=datetime.datetime.now())
+			print "here4"
+			m.save()
+			print "here3"
 		
 		return render_to_response('FindTeammates/roster.html', context_instance=RequestContext(request))
 	else:
 		return render_to_response('FindTeammates/roster.html', context_instance=RequestContext(request))
 
 def updateJoinHistory(request):
-	current_id = 17
+	user = request.user
+	current_student = Student.objects.all().get(user=user.id)
+	current_id = current_student.id
 	if request.POST.has_key('client_response'):
 		jointeamID = request.POST['client_response']
 		print jointeamID
@@ -290,8 +307,13 @@ def openTeam(request):
 
 
 def addNewTeam(request):
-	current_id = 17
-	current_course_id = 1
+	user = request.user
+	current_student = Student.objects.all().get(user=user.id)
+	current_id = current_student.id
+	student_course_list = student_course.objects.filter(studentID=current_id)
+	courselist = Course.objects.all().filter(id__in=student_course_list.values('courseID'))
+	current_course_id = courselist[0].id
+
 
 	team_name = request.POST.get("teamName", "")
 	description = request.POST.get("teamDescription", "")
@@ -338,4 +360,19 @@ def registerCourse(request):
 	sc.save()
 	return redirect("roster")
 
+def showMessages(request):
+	user = request.user
+	current_student = Student.objects.all().get(user=user.id)
+	current_id = current_student.id
+
+	student_course_list = student_course.objects.filter(studentID=current_id)
+	courselist = Course.objects.all().filter(id__in=student_course_list.values('courseID'))
+	all_courses = Course.objects.all().exclude(id__in=courselist.values('id'))
+
+	template = loader.get_template('FindTeammates/messages.html')
+
+	current_course_id = courselist[0].id
+	message_list = Message.objects.all().filter(receiverID=current_id)
+	context = RequestContext(request, {'courselist':courselist, 'all_courses':all_courses, 'current_course_id':current_course_id, 'message_list':message_list})
+	return HttpResponse(template.render(context))
 
