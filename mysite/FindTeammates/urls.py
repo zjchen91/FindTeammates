@@ -16,5 +16,6 @@ urlpatterns = patterns('',
     url(r'^createCourse$', views.createCourse),
     url(r'^registerCourse$', views.registerCourse),
     url(r'^showMessages$', views.showMessages, name="showMessages"),
+    url(r'^team_detail/(?P<teamID>[0-9]+)/$', views.team_detail),
 
 )

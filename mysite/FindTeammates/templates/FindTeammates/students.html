@@ -40,7 +40,7 @@
              <h4>{{ student.headline}}</h4>
             <h4> recommended rate: {{rate}}</h4>
            
-            <h5> {{student.skill}}</h5>
+            <h4><div class="alert alert-danger" role="alert"> Skills:  {{student.skill|slice:"1:-1"|rjust:"10" }}</div></h4>
           
             <form method="post" name="" >
                 {% csrf_token %}

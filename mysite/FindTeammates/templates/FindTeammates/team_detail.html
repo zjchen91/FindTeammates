@@ -1,0 +1,43 @@
+ 
+ {% extends "FindTeammates/base.html" %}
+
+{% block content %}
+
+<div style="margin-top: 50px; margin-left:50px; margin-right:50px">
+
+    <div class="row jumbotron">
+        <div class="col-md-3">
+            <img src="../../../static/FindTeammates/img/default_team_image.jpg" alt="">
+        </div>
+        <div class="col-md-7 col-md-offset-1">
+             <h3><span class="label label-primary">Team Name</span>  {{team.teamName|rjust:"10" }}</h3>
+             <h3><span class="label label-success">University</span>   {{team.courseID.University|rjust:"10" }} </h3>
+             <h3><span class="label label-warning">Course Name</span>   {{team.courseID.courseName|rjust:"50"}} </h3>
+             <h3><span class="label label-info">Professor</span>   {{team.courseID.Professor}} </h3>
+             <h3><span class="label label-primary">Team Capacity</span>   {{team.Size}} </h3>
+             <h3><span class="label label-success">Team Leader</span>   {{team.ownerID.name}} </h3>
+             <h3><span class="label label-warning">Team Description</span> {{team.teamDescription}} </h3>
+             
+        </div>
+    </div>
+    <div class="row">
+       <h3><span class="label label-danger text-center">Team Members</span></h3>
+       <hr>
+       <hr>
+        {% for student in team_members %}
+        <div class="col-lg-4 col-sm-6">
+            <img class="img-circle img-responsive img-center" src={{student.image}} alt="" height="200" width="200">
+            <h3 class=" text-center"><a href={{student.url}}}>{{ student.name }}</a></h3>
+             <h4 class="text-center">{{ student.headline}}</h4>
+             <h4>
+            <div class="alert alert-danger" role="alert"> Skills:  {{student.skill|slice:"1:-1"|rjust:"10" }}</div>
+            </h4>
+        </div>
+        {% endfor %}
+    </div>
+
+ 
+
+<hr>
+</div>
+{% endblock %}

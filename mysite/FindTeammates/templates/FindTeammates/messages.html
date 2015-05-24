@@ -1,0 +1,34 @@
+ 
+ {% extends "FindTeammates/base.html" %}
+
+{% block content %}
+
+<div style="margin-top: 50px; margin-left:50px; margin-right:50px">
+<!-- Team Members Row -->
+
+    {% if message_list.0 %}
+        {% for message in message_list %}
+       <div class="row">
+
+        <div class="panel panel-default">
+        <div class="panel-body">
+        {% ifequal message.messageType 1 %}
+         <h5><a href={{message.senderID.url}}}> {{message.senderID.name }}  </a> asks to join your team {{message.teamID.teamName}} </h5>
+         {% endifequal %}
+         {% ifequal message.messageType 5 %}
+         <h5><a href={{message.senderID.url}}}> {{message.senderID.name }}  </a>invites you to join his/her team {{message.teamID.teamName}} <h5>
+         {% endifequal %}
+         </div>
+        </div>
+
+       </div>
+
+        {% endfor %}
+    {% else %}
+        <h3> There are no messages for you. </h3>
+    {% endif %}
+ 
+
+<hr>
+</div>
+{% endblock %}

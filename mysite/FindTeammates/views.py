@@ -241,6 +241,8 @@ def callback(request):
 	else:
 		current_user = User(is_superuser=0, is_staff=0, is_active=1, date_joined=datetime.datetime.now(), username=profile_id)
 		current_user.save()
+		if profile_pic.strip()=="":
+			profile_pic = "../../static/FindTeammates/img/default_student_image.png"
 		current_student = Student(user=current_user, name=profile_name, skill=skills, image=profile_pic, url=profile_url, headline=profile_headline, profile_id=profile_id)
 		current_student.save()
 
@@ -379,4 +381,22 @@ def showMessages(request):
 	message_list = Message.objects.all().filter(receiverID=current_id)
 	context = RequestContext(request, {'courselist':courselist, 'all_courses':all_courses, 'current_course_id':current_course_id, 'message_list':message_list})
 	return HttpResponse(template.render(context))
+
+def team_detail(request, teamID):
+	user = request.user
+	current_student = Student.objects.all().get(user=user.id)
+	current_id = current_student.id
+
+	student_course_list = student_course.objects.filter(studentID=current_id)
+	courselist = Course.objects.all().filter(id__in=student_course_list.values('courseID'))
+	all_courses = Course.objects.all().exclude(id__in=courselist.values('id'))
+	current_course_id = courselist[0].id
+
+	team = Team.objects.all().get(id=teamID)
+	stu_teams = student_team.objects.all().filter(teamID=teamID)
+	team_members = Student.objects.all().filter(id__in=stu_teams.values('studentID'))
+	template = loader.get_template('FindTeammates/team_detail.html')
+	context = RequestContext(request, {'team':team, 'team_members':team_members, 'courselist':courselist, 'all_courses':all_courses, 'current_course_id':current_course_id})
+	return HttpResponse(template.render(context))
+
 
