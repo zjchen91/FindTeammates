@@ -26,8 +26,66 @@ RETURN_URL = addr+ callback_postfix
 BASE = os.path.dirname(os.path.abspath(__file__))
 
 
+def roster(request):
 
-def roster(request, courseID="0"):
+	template = loader.get_template('FindTeammates/roster.html')
+	user = request.user
+	current_student = Student.objects.all().get(user=user.id)
+	current_id = current_student.id
+
+	student_course_list = student_course.objects.filter(studentID=current_id)
+	courselist = Course.objects.all().filter(id__in=student_course_list.values('courseID'))
+	all_courses = Course.objects.all().exclude(id__in=courselist.values('id'))
+
+	if len(courselist)==0:
+		context = RequestContext(request, {'student_list': [], 'courselist':[], 'all_courses':all_courses})
+		return HttpResponse(template.render(context))
+
+	else:	
+		current_course_id = courselist[0].id
+		current_course = Course.objects.all().get(id=current_course_id)
+		current_course_teams = Team.objects.all().filter(courseID=current_course_id)
+		stpair = student_team.objects.all().filter(teamID__in=current_course_teams)
+		studentList = student_course.objects.all().filter(courseID=current_course_id)
+
+		alluser = []
+		for stu in studentList:
+			alluser.append(str(stu.studentID.id))
+	
+		# see whether current user is in a team or not
+
+		# in a team
+		in_team = 0
+		if len(stpair.filter(studentID=current_id)) != 0:
+			in_team = 1
+			preferuser = {}
+			inviteHis = teamInviteStuHistory.objects.all()
+			for invite in inviteHis:
+				ter = str(invite.inviterID.id)
+				tee = str(invite.inviteeID.id)
+				if ter in preferuser:
+					preferuser[ter].append(tee)
+				else:
+					preferuser[ter] = [tee]
+			test = recommander(str(current_id), 'team', preferuser, alluser)
+			ranklist = test.run()
+			studentObjectList = []
+			for item in ranklist:
+				studentObjectList.append((Student.objects.get(id=int(item[0])), item[1]))
+
+			
+			context = RequestContext(request, {'student_list': studentObjectList, 'courselist':courselist, 'all_courses':all_courses, 'current_course_id':current_course_id, 'in_team':in_team, 'current_course':current_course})
+			return HttpResponse(template.render(context))
+		else:
+			studentObjectList = []
+			for s in studentList:
+				studentObjectList.append((s, 'N/A'))
+
+			context = RequestContext(request, {'student_list': studentObjectList, 'courselist':courselist, 'all_courses':all_courses, 'current_course_id':current_course_id, 'in_team':in_team, 'current_course':current_course})
+			return HttpResponse(template.render(context))
+
+
+def roster_with_courseID(request, courseID="0"):
 
 	template = loader.get_template('FindTeammates/roster.html')
 	user = request.user
@@ -261,7 +319,7 @@ def callback(request):
 	login(request, current_user)
 	print post
 	## ~~~~~~~~~~~~~~~~~~response whatever data~~~~~~~~~~~~~~~~~~~~~~~~~~
-	return redirect("roster")
+	return redirect("/FindTeammates/roster")
 
 # redirect the browser to Linkedin login page
 def site_login(request):
@@ -366,7 +424,7 @@ def createCourse(request):
 	new_course.courseDescription = ""
 
 	new_course.save()
-	return redirect("roster")
+	return redirect("/FindTeammates/roster")
 
 def registerCourse(request):
 	courseid = request.POST.get('choosecourse',"")
@@ -375,7 +433,7 @@ def registerCourse(request):
 	current_course = Course.objects.all().get(id=courseid)
 	sc = student_course(studentID=current_student, courseID=current_course)
 	sc.save()
-	return redirect("roster")
+	return redirect("/FindTeammates/roster")
 
 def showMessages(request):
 	user = request.user
