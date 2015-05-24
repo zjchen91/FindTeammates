@@ -2,8 +2,9 @@
 # http://curl.haxx.se/rfc/cookie_spec.html
 # This is a generated file!  Do not edit.
 
-.linkedin.com	TRUE	/	FALSE	1495552477	bcookie	"v=2&ab1906c8-610c-4a31-86c4-aa61196e2b1f"
-.linkedin.com	TRUE	/	FALSE	1432525025	lidc	"b=VB67:g=184:u=1:i=1432438625:t=1432525025:s=AQEMnayKep-G5trOXFBkRj9XHFvDvLD5"
-.www.linkedin.com	TRUE	/	TRUE	1495552477	bscookie	"v=1&20150524033705a0784283-5366-430f-8cbc-ebd950c1984dAQGyoWKDQCul9TCxENDZTnjrTzalr3Vz"
-www.linkedin.com	FALSE	/	FALSE	1432440433	leo_auth_token	"GST:8ndjxPUHoN4QqkOUJQo9Hq8J0gF6qrbLKnI9YufVov4cI0O2LOzTQa:1432438634:87d3df304b02296e02de222de91413399d94472d"
-www.linkedin.com	FALSE	/	FALSE	1495510626	visit	"v=1&G"
+.linkedin.com	TRUE	/	FALSE	1495563906	bcookie	"v=2&1df93a18-6496-479c-85dc-9582ec1fa87e"
+.linkedin.com	TRUE	/	FALSE	1432532926	lidc	"b=VB63:g=181:u=12:i=1432450056:t=1432532926:s=AQE1t8NlBCa6ZZjdAjXD11Y4RutwkqJe"
+.www.linkedin.com	TRUE	/	FALSE	1440226055	JSESSIONID	"ajax:3780998003720935453"
+.www.linkedin.com	TRUE	/	TRUE	1495563906	bscookie	"v=1&201505240647340f1097c5-7d52-4879-80fc-f906d869d553AQGQFgVEDjMyfsaRtRJXtppx8hdc4L7Y"
+.www.linkedin.com	TRUE	/	FALSE	1440226055	li_at	AQECARPqQcME4NVfAAABTYStPWoAAAFNhRsaaksxPr-43h20S-kKTdBZMUkkCEZteDzJ2SY6PSPpLTGl2CLEiiW1P-z0u1ApTpqh7FIfiyD0JrxkTy7UAAwMGCns5FGE_CDNLMF8Am3yelYJWKmDg38
+www.linkedin.com	FALSE	/	FALSE	1495522056	visit	"v=1&M"

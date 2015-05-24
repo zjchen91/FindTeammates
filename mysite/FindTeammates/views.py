@@ -112,12 +112,16 @@ def teams(request):
 
 		# in a team
 		if len(stpair.filter(studentID=current_id)) != 0:
+			#print 'in a team'
+			#print current_id
 			teamObjectList = []
 			for s in teamList:
 				teamObjectList.append((s, 'N/A'))
 			context = RequestContext(request, {'team_list': teamObjectList,  'courselist':courselist, 'all_courses':all_courses})
 			return HttpResponse(template.render(context))
 		else:
+			#print 'alone'
+			#print current_id
 			preferteam = {}
 			joinHis = stuJoinTeamHistory.objects.all()
 			for join in joinHis:
