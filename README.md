@@ -12,10 +12,12 @@
 ## Installation
 
 Type following commands in shell:
+
 1. git clone https://github.com/zjchen91/FindTeammates.git
 2. cd FindTeammates
 3. cd mysite
 4. python manage.py runserver
+
 Then copy url http://127.0.0.1:8000/FindTeammates/site to your browser.
 
 ## Contributors & Maintainers
