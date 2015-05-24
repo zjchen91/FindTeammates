@@ -8,7 +8,8 @@ class Student(models.Model):
 	image = models.CharField(max_length=1000)
 	url = models.CharField(max_length=1000)
 	headline = models.CharField(max_length=1000)
-	#user = models.OneToOneField(User)
+	user = models.OneToOneField(User, default=None)
+	profile_id = models.CharField(max_length=100, default=None)
 	'''
 	attributes from linkedin
 	'''
@@ -20,6 +21,8 @@ class Course(models.Model):
 	Capacity = models.IntegerField(default=0)
 	groupSize = models.IntegerField(default=0)
 	courseDescription = models.CharField(max_length=500)
+	semester = models.IntegerField(default=2015)
+	season = models.IntegerField(default=3)
 
 class Team(models.Model):
 	teamName = models.CharField(max_length=100)

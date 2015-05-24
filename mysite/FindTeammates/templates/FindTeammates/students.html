@@ -2,7 +2,6 @@
     $(document).ready(function() {
         $("input[name=invite]").click(function() {
             //var input_string = $("#forminput").val();
-            console.log('yay');
             alert("Sent invitation successfully!");
             $.ajax({
                 url : "../inviteHis", 
@@ -28,16 +27,20 @@
     
 <!-- Team Members Row -->
 <div class="row">
-    <div class="col-lg-12">
+    {% if courselist.0 %}
+<div class="col-lg-12">
         <h2 class="page-header">Who is still finding a team... </h2>
     </div>
     {% if student_list.0 %}
         {% for student in student_list %}
         <div class="col-lg-4 col-sm-6 text-center">
-            <img class="img-circle img-responsive img-center" src={{ student.image }} alt="" height="200" width="200">
+            <img class="img-circle img-responsive img-center" src={{student.image}} alt="" height="200" width="200">
             <h3><a href={{student.url}}}>{{ student.name }}</a></h3>
-            <small>{{ student.headline}}</small>
-            <small>{{ student.skill}}</small>
+             <h4>{{ student.headline}}</h4>
+            <h4> recommended rate: </h4>
+           
+            <h5> {{student.skill}}</h5>
+          
             <form method="post" name="" >
                 {% csrf_token %}
                 <input id={{ student.id }} name="invite" type="button" class="btn btn-primary btn-large" value="Invite!"></input>
@@ -45,7 +48,13 @@
         </div>
         {% endfor %}
     {% else %}
-        <p>No plans are available.</p>
+        <p> There are no other students who are still finding a team. </p>
+    {% endif %}
+    {% else %}
+    <div class="col-lg-12">
+        <h2 class="page-header">You haven't registered any course.</h2>
+        <h2 class="page-header">Please register one course first. </h2>
+    </div>
     {% endif %}
 </div>
 

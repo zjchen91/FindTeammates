@@ -11,57 +11,79 @@ from django.contrib.auth.models import User
 import json
 import socket
 import re
+import datetime
 from cookie import *
+from django.contrib.auth import login
 
-API_SECRET = 'ktG99eRUuMnZ80eW'
-USERNAME = "phoebe996@gmail.com"
-PASSWORD = "njdx3119wyw"
-TOP_URL = "http://www.linkedin.com"
-
-
+addr = 'http://localhost:8000/'
+callback_postfix = 'FindTeammates/callback'
+API_KEY = '77ivy1b3bzxmlk'
+API_SECRET = 'yyZCB6IvxBFinBcO'
+RETURN_URL = addr+ callback_postfix
 
 
 def roster(request):
-	current_id = 17
-	current_course_id = 1
 
-	stpair = student_team.objects.all()
-	studentObjectList = student_course.objects.all().filter(courseID=current_course_id)
-
-	alluser = []
-	for stu in studentObjectList:
-		alluser.append(str(stu.studentID.id))
 	template = loader.get_template('FindTeammates/roster.html')
-	# see whether current user is in a team or not
-	# in a team
-	if len(stpair.filter(studentID=current_id)) != 0:
+	user = request.user
+	current_student = Student.objects.all().get(user=user.id)
+	current_id = current_student.id
 
-		preferuser = {}
-		inviteHis = teamInviteStuHistory.objects.all()
-		for invite in inviteHis:
-			ter = str(invite.inviterID.id)
-			tee = str(invite.inviteeID.id)
-			if ter in preferuser:
-				preferuser[ter].append(tee)
-			else:
-				preferuser[ter] = [tee]
-		test = recommander(str(current_id), 'team', preferuser, alluser)
-		ranklist = test.run()
-		studentObjectList = []
-		for item in ranklist:
-			studentObjectList.append(Student.objects.get(id=int(item)))
+	student_course_list = student_course.objects.filter(studentID=current_id)
+	courselist = Course.objects.all().filter(id__in=student_course_list.values('courseID'))
+	all_courses = Course.objects.all().exclude(id__in=courselist.values('id'))
 
-		context = RequestContext(request, {'student_list': studentObjectList, 'courselist':courselist})
+	if len(courselist)==0:
+		context = RequestContext(request, {'student_list': [], 'courselist':[], 'all_courses':all_courses})
 		return HttpResponse(template.render(context))
+
 	else:
-		context = RequestContext(request, {'student_list': studentObjectList, 'courselist':courselist})
-		return HttpResponse(template.render(context))
+		current_course_id = courselist[0].id
+		current_course_teams = Team.objects.all().filter(courseID=current_course_id)
+		stpair = student_team.objects.all().filter(teamID__in=current_course_teams)
+		studentObjectList = student_course.objects.all().filter(courseID=current_course_id)
+
+		alluser = []
+		for stu in studentObjectList:
+			alluser.append(str(stu.studentID.id))
+	
+		# see whether current user is in a team or not
+		# in a team
+		if len(stpair.filter(studentID=current_id)) != 0:
+
+			preferuser = {}
+			inviteHis = teamInviteStuHistory.objects.all()
+			for invite in inviteHis:
+				ter = str(invite.inviterID.id)
+				tee = str(invite.inviteeID.id)
+				if ter in preferuser:
+					preferuser[ter].append(tee)
+				else:
+					preferuser[ter] = [tee]
+			test = recommander(str(current_id), 'team', preferuser, alluser)
+			ranklist = test.run()
+			studentObjectList = []
+			for item in ranklist:
+				studentObjectList.append(Student.objects.get(id=int(item)))
+
+			# just for test
+			test = student_course.objects.all().filter(courseID=current_course_id)
+			studentObjectList = Student.objects.all().filter(id__in=test.values('studentID'))
+			
+			context = RequestContext(request, {'student_list': studentObjectList, 'courselist':courselist, 'all_courses':all_courses})
+			return HttpResponse(template.render(context))
+		else:
+
+			# just for test
+			test = student_course.objects.all().filter(courseID=current_course_id)
+			studentObjectList = Student.objects.all().filter(id__in=test.values('studentID'))
+			
+			context = RequestContext(request, {'student_list': studentObjectList, 'courselist':courselist, 'all_courses':all_courses})
+			return HttpResponse(template.render(context))
 
 
 def site(request):
-	print "yayayaya"
 	return render_to_response("FindTeammates/site.html")
-
 
 
 def teams(request):
@@ -73,6 +95,12 @@ def teams(request):
 	for team in teamObjectList:
 		allteam.append(str(team.id))
 	template = loader.get_template('FindTeammates/teams.html')
+
+	student_course_list = student_course.objects.filter(studentID=current_id)
+	courselist = []
+	for stu_co in student_course_list:
+		courselist.append(stu_co.courseID)
+
 	# in a team
 	if len(stpair.filter(studentID=current_id)) != 0:
 		context = RequestContext(request, {'team_list': teamObjectList,  'courselist':courselist})
@@ -96,65 +124,6 @@ def teams(request):
 		context = RequestContext(request, {'team_list': teamObjectList, 'courselist':courselist})
 		return HttpResponse(template.render(context))
 
-'''	
-def login(request):
-	user = User(id=1000000, password="test")
-	user.save()
-	print "in login view"
-	
-	RETURN_URL = 'http://localhost:8000/FindTeammates/'
-
-	authentication = linkedin.LinkedInAuthentication(API_KEY, API_SECRET, RETURN_URL, linkedin.PERMISSIONS.enums.values()[:1])
-	print linkedin.PERMISSIONS.enums.values()[0]
-	print authentication.authorization_url  # open this url on your browser
-	#application = linkedin.LinkedInApplication(authentication)
-	#http://localhost:8000/FindTeammates/?code=AQR5MryHH-PrPjBguVK8suK-4s8FSBip5KIYxTPl0ps1RZY1tsYScut4KsWblKU0vibFLRBav5jlp9d2SNj1PSWUBPX_gX6ZmuYIPzlMwS4RDK6ygzY&state=360a3fc85fede5771d61480973a46f4a
-	#http://localhost:8000/FindTeammates/?code=AQQupO6iTYMJrFuFH3P-EJTsIo9cN6nDi8yj0PArsll41n9WQfVmBQo8y-Hrz2SyMkfAC6mLjNLQG0V__VwZr4npC1sFTlAIku3BtT-KaEP5w9MlRzM&state=0a19199cf14173394df29fc2e682299f
-	#http://localhost:8000/FindTeammates/?code=AQTR9xUM7SuPw5xs4OVTrhjARrXWVPET5WrG3fQaDAgZsB_9HZgdFD_YFOIrn-T2vFs5i9MFGl1ZpbeVeokEyCue2wiEQH1iPILJbSYTqtZx86HUBH4&state=7873719d9118e017c81e7b9df825a6ad
-	
-	#url = application.get_profile()
-	
-	url ="https://www.linkedin.com/profile/view?id=334119363&trk=hp-identity-photo"
-	print url
-
-	# create a password manager
-	password_mgr = urllib2.HTTPPasswordMgrWithDefaultRealm()
-
-	# Add the username and password.
-	# If we knew the realm, we could use it instead of None.
-	password_mgr.add_password(None, url, USERNAME, PASSWORD)
-
-	handler = urllib2.HTTPBasicAuthHandler(password_mgr)
-
-	# create "opener" (OpenerDirector instance)
-	opener = urllib2.build_opener(handler)
-
-	# use the opener to fetch a URL
-	opener.open(url)
-
-	# Install the opener.
-	# Now all calls to urllib2.urlopen use our opener.
-	urllib2.install_opener(opener)
-	req = urllib2.Request(url)
-	resp = urllib2.urlopen(req)
-	print "----------------"
-	source_code = str(resp.read().decode())
-	print source_code
-	
-	i = source_code.find("skill")
-	while i>0:
-		print "yay"
-		i = i+17
-		skill = ""
-		while(not source_code[i]=='"'):
-			skill = skill + source_code[i]
-			i=i+1
-		print skill
-		i = source_code.find("fmt__skill_name")
-	
-	return redirect(authentication.authorization_url)
-	'''
-
 
 # From Enrui, New listening subAddress
 # If I missed something, let me know ASAP.
@@ -174,13 +143,18 @@ u'firstName': u'Enrui'}
 '''
 
 def callback(request):
+	permi = linkedin.PERMISSIONS.enums.values()[:1]
+	authentication = linkedin.LinkedInAuthentication(API_KEY, API_SECRET, RETURN_URL, permi)
+
 	code = request.GET.get("code")
 	authentication.authorization_code = code
 	t = authentication.get_access_token()
 	linkin_App = linkedin.LinkedInApplication(token=t)
+
 	# ~~~~~~~~~~~~~~~~~~get token~~~~~~~~~~~~~~~~
 	profile = linkin_App.get_profile()
 	profile_url = profile['siteStandardProfileRequest']['url']
+	print profile_url
 
 	# ~~~~~~~~~~~~~~~~~~~~get info from basic_profile~~~~~~~~~~~~
 	profile_id = profile['id']
@@ -194,11 +168,14 @@ def callback(request):
 		password = f.readline().split('=')[1].strip(' \t"')
 	parser = LinkedInParser(username, password)
 	res = parser.loadPage(profile_url)
+
 	## res contains all the full_profile, here I only parse the skills.
 	## Give me a list of things need to be parsed
 	## ~~~~~~~~~~~here is the code to parse profile_pic~~~~~~~~~~~~~~~
 	try:
 		m = re.findall('"profile-picture".+jpg\' width', res)[0]
+		print "m"
+		print m
 		for i in range(len(m)):
 			n = len("img src='")
 			if m[i:i+n] == "img src='":
@@ -224,36 +201,45 @@ def callback(request):
 		print "error happened in parsing skills"
 	## ~~~~~~~~~~here is the code of adding data to the database~~~~~~~~~~
 	# I don't know how to add it, this is a dictionary for you.
-	post = {'name':profile_name,		#Enrui Liao
+	post = {'profile_id':profile_id,
+			'name':profile_name,		#Enrui Liao
 			'skill':skills,				#['Matlab','Java']
 			'image':profile_pic,		#(str)
 			'url':profile_url,			#(str)
 			'headline':profile_headline	#(str)
 			}
+	print "profile id"
+	print profile_id
+	current_student = Student.objects.all().filter(profile_id=profile_id)
+	current_user = None
+	if len(current_student)==1:
+		current_student = current_student[0]
+		current_user = current_student.user
+		current_student.name = profile_name
+		current_student.skill = skills
+		current_student.image = profile_pic
+		current_student.headline = profile_headline
+		current_student.url = profile_url
+		current_student.save()
+	else:
+		current_user = User(is_superuser=0, is_staff=0, is_active=1, date_joined=datetime.datetime.now(), username=profile_id)
+		current_user.save()
+		current_student = Student(user=current_user, name=profile_name, skill=skills, image=profile_pic, url=profile_url, headline=profile_headline, profile_id=profile_id)
+		current_student.save()
 
+	current_user.backend = 'django.contrib.auth.backends.ModelBackend'
+	login(request, current_user)
+	print post
 	## ~~~~~~~~~~~~~~~~~~response whatever data~~~~~~~~~~~~~~~~~~~~~~~~~~
-	return render_to_response('FindTeammates/roster.html')
+	return redirect("roster")
 
 # redirect the browser to Linkedin login page
-def login(request):
-	addr = 'http://localhost:8000/'
-	callback_postfix = 'FindTeammates/callback'
-	API_KEY = '77ivy1b3bzxmlk'
-	API_SECRET = 'yyZCB6IvxBFinBcO'
-	RETURN_URL = addr+ callback_postfix
+def site_login(request):
 
 	permi = linkedin.PERMISSIONS.enums.values()[:1]
 	authentication = linkedin.LinkedInAuthentication(API_KEY, API_SECRET, RETURN_URL, permi)
 	url = authentication.authorization_url	
 	return redirect(url)
-
-
-def afterlogin(request):
-	code = request.GET.get("code")
-	code=code.split("code=")[1].split("&state=")[0]
-	authentication.authorization_code = code
-	token=authentication.get_access_token()
-	application = linkedin.LinkedInApplication(token=token)
 
 
 def updateInviteHistory(request):
@@ -325,6 +311,15 @@ def createCourse(request):
 	new_course.courseDescription = ""
 
 	new_course.save()
+	return redirect("roster")
+
+def registerCourse(request):
+	courseid = request.POST.get('choosecourse',"")
+	user = request.user
+	current_student = Student.objects.all().get(user=user)
+	current_course = Course.objects.all().get(id=courseid)
+	sc = student_course(studentID=current_student, courseID=current_course)
+	sc.save()
 	return redirect("roster")
 
 

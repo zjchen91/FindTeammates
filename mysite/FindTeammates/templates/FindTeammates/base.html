@@ -71,7 +71,7 @@
                         <a href="#">Message</a>
                     </li>
                     <li class="dropdown">
-                    <a href="#" data-toggle="dropdown" class="dropdown-toggle">Courses <b class="caret"></b></a>
+                    <a href="#" data-toggle="dropdown" class="dropdown-toggle">My Courses <b class="caret"></b></a>
                     <ul class="dropdown-menu">
                         {% for course in courselist %}
                     <li><a href="#">{{course.courseName}}</a></li>
@@ -80,7 +80,9 @@
 
                      </ul>
                      </li>
-                     <li id="createcourse"><a href="#" data-toggle="modal" data-target="#createNewCourseModal"> Create New Course </a></li>
+                     <li id="registercourse">
+                        <a href="#" data-toggle="modal" data-target="#registerNewCourseModal"> Register New Course </a>
+                    </li>
 
                 </ul>
             </div>
@@ -89,7 +91,7 @@
         <!-- /.container -->
     </nav>
     <!-- Page Content -->
-    <div class="container" style="margin-top: 100px">
+    <div class="container" style="margin-top: 100px;">
 
        {% block content %}{% endblock %}
 
@@ -140,6 +142,43 @@
   </div>
 </div>
  <!-- Modal -->
+
+ <div class="modal fade" id="registerNewCourseModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+        <h4 class="modal-title" id="myModalLabel">Register New Course</h4>
+      </div>
+      <div class="modal-body">
+        <form id="registerform" role="form" action="registerCourse" method="post">
+        {% csrf_token %}
+            {% for course in all_courses %}
+             <div class="radio">
+              <label id="{{course.id}}">
+                <input type="radio" name="choosecourse" id="option{{course.id}}" value= {{ course.id }}>
+                {{course.University}}    
+                <br/>
+                {{course.semester}} {% if course.season == '1' %}Spring{% elif course.season == '2' %}Summer{% else %}Fall{% endif %}   
+                 <br/>
+                {{course.courseName}} 
+                 <br/>
+                {{course.Professor}} 
+              </label>
+            </div>
+            {% endfor %}
+        <br\>
+        <br\>
+        <br>
+            <button id="registerbutton" type="submit" class="btn btn-primary">Register</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+ <!-- Modal -->
+
+
 
 </body>
 
