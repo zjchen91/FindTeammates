@@ -38,14 +38,16 @@
             <img class="img-circle img-responsive img-center" src={{student.image}} alt="" height="200" width="200">
             <h3><a href={{student.url}}}>{{ student.name }}</a></h3>
              <h4>{{ student.headline}}</h4>
-            <h4> recommended rate: {{rate}}</h4>
+            
            
             <h5> {{student.skill}}</h5>
-          
+            {% if rate != "N/A" %}
+            <h4> recommended rate: {{rate}}</h4>
             <form method="post" name="" >
                 {% csrf_token %}
                 <input id={{ student.id }} name="invite" type="button" class="btn btn-primary btn-large" value="Invite!"></input>
             </form>
+            {% endif %}
         </div>
         {% endfor %}
     {% else %}

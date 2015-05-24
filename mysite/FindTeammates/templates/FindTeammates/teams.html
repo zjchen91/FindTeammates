@@ -34,6 +34,8 @@
     <!-- Jumbotron Header -->
     <header class="jumbotron hero-spacer">
         
+        <h1>A Warm Welcome!</h1>
+        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ipsa, ipsam, eligendi, in quo sunt possimus non incidunt odit vero aliquid similique quaerat nam nobis illo aspernatur vitae fugiat numquam repellat.</p>
         <p>
             <button type="submit" class="btn btn-primary btn-large" onclick="window.location.href='../openteam'">Create a Team Now!</button>
         </p>
@@ -59,13 +61,15 @@
                 <div class="caption">
                     <h3>{{ team.teamName }}</h3>
                     <h4> Owner: {{team.ownerID.name}}</h4>
-                    <h4> recommended rate: {{rate}}</h4>
+                    
                     <p>{{ team.teamDescription }}</p>
-
+                    {% if rate != "N/A" %}
+                    <h4> recommended rate: {{rate}}</h4>
                     <form method="post" name="" >
                         {% csrf_token %}
                         <input id={{ team.id }} name="join" type="button" class="btn btn-primary btn-large" value="Join!"></input>
                     </form> 
+                    {% endif %}
                 </div>
             </div>
         </div>
