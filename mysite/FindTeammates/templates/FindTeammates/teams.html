@@ -5,11 +5,10 @@
  <script type="text/javascript">
     $(document).ready(function() {
         $("input[name=join]").click(function() {
-            //var input_string = $("#forminput").val();
-            console.log('yay');
+           
             alert("Sent join request successfully!");
             $.ajax({
-                url : "../joinHis", 
+                url : "../../joinHis", 
                 type : "POST",
                 dataType: "json", 
                 data : {
@@ -43,7 +42,7 @@
     <!-- Jumbotron Header -->
     {% ifequal in_team 0 %}
     <header class="jumbotron">
-            <button type="submit" class="btn btn-primary btn-large" onclick="window.location.href='../openteam'">Create a Team Now</button>
+            <button type="button" class="btn btn-primary" href="#" data-toggle="modal" data-target="#createNewTeamModal">Create a Team Now</button>
         </p>
     </header>
     {% endifequal %}
@@ -76,11 +75,48 @@
         </div>
         {% endfor %}
     {% else %}
-        <p>No plans are available.</p>
+        <h3>No teams are available.</h3>
     {% endif %}
 </div>
 
 <hr>
+
+ <div class="modal fade" id="createNewTeamModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+        <h4 class="modal-title" id="myModalLabel">Register New Course</h4>
+      </div>
+      <div class="modal-body">
+
+       <form id="createform" role="form" action="../../addNewTeam" method="post">
+    {% csrf_token %}
+    <div class="form-group hidden" >
+        <label for="courseID" >CourseID</label>
+        <input type="text" name="courseID" class="createinput form-control" id="courseID" value="{{current_course_id}}">
+    </div>
+    <div class="form-group">
+        <label for="teamName">Team Name</label>
+        <input type="text" name="teamName" class="createinput form-control" id="teamName" placeholder="Enter team name...">
+    </div>
+    <div class="form-group">
+        <label for="tteamDescription">Description</label>
+        <input type="text" name="teamDescription" class="createinput form-control" id="teamDescription" placeholder="Enter team description...">
+    </div>
+    <div class="form-group">
+        <label for="skills">Preferred Skills</label>
+        <input type="text" name="skills" class="createinput form-control" id="skills" placeholder="Divided by commma, example: Java, C++, C">
+    </div>
+    <button id="createbutton" type="submit" class="btn btn-primary">Create Team</button>
+</form>
+
+      </div>
+    </div>
+  </div>
+</div>
+ <!-- Modal -->
+
 {% endblock %}
 
 

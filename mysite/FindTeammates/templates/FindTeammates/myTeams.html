@@ -1,0 +1,30 @@
+ {% extends "FindTeammates/base.html" %}
+
+{% block content %}
+
+ <!-- Page Features -->
+ <div class="row jumbotron">
+    <h2>All my teams</h2>
+ </div>
+    <div class="row text-center " style="margin-left:50px; margin-right:50px">
+    {% if my_teams.0 %}
+        {% for team in my_teams %}
+        <div class="col-md-4 col-sm-8 hero-feature">
+            <div class="thumbnail">
+                <img src="../../static/FindTeammates/img/default_team_image.jpg" alt="">
+                <div class="caption">
+
+                    <h3 ><a href="/FindTeammates/team_detail/{{team.id}}/">{{ team.teamName }}</a></h3>
+                    <h4 > Team Leader: {{team.ownerID.name}}</h4>
+
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <h3>You don't have any teams.</h3>
+    {% endif %}
+</div>
+
+<hr>
+{% endblock %}

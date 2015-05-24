@@ -3,20 +3,77 @@
 
 {% block content %}
 
+
+ <script type="text/javascript">
+    $(document).ready(function() {
+        $("input[name=accept_join]").click(function() {
+           
+            alert("Accept successfully!");
+            $.ajax({
+                url : "accept_join", 
+                type : "POST",
+                dataType: "json", 
+                data : {
+                    client_response : this.id,
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                    },
+                    success : function(json) {
+                        location.href = "http://" + location.host + "/FindTeammates/showMessages";
+                    },
+                    error : function(xhr,errmsg,err) {
+                        //alert(xhr.status + ": " + xhr.responseText);
+                    }
+            });
+            return false;
+        });
+
+        $("input[name=accept_invite]").click(function() {
+           
+            alert("Accept successfully!");
+            $.ajax({
+                url : "accept_join", 
+                type : "POST",
+                dataType: "json", 
+                data : {
+                    client_response : this.id,
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                    },
+                    success : function(json) {
+                        location.href = "http://" + location.host + "/FindTeammates/showMessages";
+                    },
+                    error : function(xhr,errmsg,err) {
+                        //alert(xhr.status + ": " + xhr.responseText);
+                    }
+            });
+            return false;
+        });
+    });
+</script>
+
+
+
 <div style="margin-top: 50px; margin-left:50px; margin-right:50px">
 <!-- Team Members Row -->
 
     {% if message_list.0 %}
         {% for message in message_list %}
-       <div class="row">
+       <div class="row" id="row-{{message.id}}">
 
         <div class="panel panel-default">
         <div class="panel-body">
         {% ifequal message.messageType 1 %}
-         <h5><a href={{message.senderID.url}}}> {{message.senderID.name }}  </a> asks to join your team {{message.teamID.teamName}} </h5>
+         <h5><a href={{message.senderID.url}}}> {{message.senderID.name }}  </a> asks to join your team {{message.teamID.teamName}} </h5> 
+         <form method="post" name="" >
+                        {% csrf_token %}
+                        <input id={{ message.id }} name="accept_join" type="button" class="btn btn-primary btn-large" value="accept_join"></input>
+         </form> 
          {% endifequal %}
          {% ifequal message.messageType 5 %}
          <h5><a href={{message.senderID.url}}}> {{message.senderID.name }}  </a>invites you to join his/her team {{message.teamID.teamName}} <h5>
+             <form method="post" name="" >
+                        {% csrf_token %}
+                        <input id={{ message.id }} name="accept_invite" type="button" class="btn btn-primary btn-large" value="accept_invite"></input>
+         </form> 
          {% endifequal %}
          </div>
         </div>

@@ -15,6 +15,7 @@ import datetime
 from cookie import *
 from django.contrib.auth import login
 import os.path
+from django.template.context_processors import csrf
 
 
 addr = 'http://localhost:8000/'
@@ -77,8 +78,12 @@ def roster(request):
 			context = RequestContext(request, {'student_list': studentObjectList, 'courselist':courselist, 'all_courses':all_courses, 'current_course_id':current_course_id, 'in_team':in_team, 'current_course':current_course})
 			return HttpResponse(template.render(context))
 		else:
-			studentObjectList = []
-			for s in studentList:
+			studentObjectList=[]
+			students_with_team = student_team.objects.all().filter(teamID__in=current_course_teams)
+			print "current_id"
+			print current_id
+			student_without_team = Student.objects.all().exclude(id__in=students_with_team.values("studentID")).filter(id__in=studentList.values("studentID")).exclude(id=current_id)
+			for s in student_without_team:
 				studentObjectList.append((s, 'N/A'))
 
 			context = RequestContext(request, {'student_list': studentObjectList, 'courselist':courselist, 'all_courses':all_courses, 'current_course_id':current_course_id, 'in_team':in_team, 'current_course':current_course})
@@ -139,8 +144,10 @@ def roster_with_courseID(request, courseID="0"):
 			context = RequestContext(request, {'student_list': studentObjectList, 'courselist':courselist, 'all_courses':all_courses, 'current_course_id':current_course_id, 'in_team':in_team, 'current_course':current_course})
 			return HttpResponse(template.render(context))
 		else:
-			studentObjectList = []
-			for s in studentList:
+			studentObjectList=[]
+			students_with_team = student_team.objects.all().filter(teamID__in=current_course_teams)
+			student_without_team = Student.objects.all().exclude(id__in=students_with_team.values("studentID")).filter(id__in=studentList.values("studentID")).exclude(id=current_id)
+			for s in student_without_team:
 				studentObjectList.append((s, 'N/A'))
 
 			context = RequestContext(request, {'student_list': studentObjectList, 'courselist':courselist, 'all_courses':all_courses, 'current_course_id':current_course_id, 'in_team':in_team, 'current_course':current_course})
@@ -148,7 +155,9 @@ def roster_with_courseID(request, courseID="0"):
 
 
 def site(request):
-	return render_to_response("FindTeammates/site.html")
+	c = {}
+	c.update(csrf(request))
+	return render_to_response("FindTeammates/site.html", c)
 
 
 def teams(request, courseID="0"):
@@ -365,17 +374,49 @@ def updateJoinHistory(request):
 	user = request.user
 	current_student = Student.objects.all().get(user=user.id)
 	current_id = current_student.id
+
 	if request.POST.has_key('client_response'):
 		jointeamID = request.POST['client_response']
-		print jointeamID
 		joiner = Student.objects.get(id=current_id)
 		jointeam = Team.objects.get(id=jointeamID)
 		his = stuJoinTeamHistory(joinerID=joiner, joineeTeamID=jointeam)
 		his.save()
+	
+		team_owner = jointeam.ownerID
+	
+		m = Message(senderID=joiner, receiverID=team_owner, messageType=1, messageStatus=0, content="", teamID=jointeam, date=datetime.datetime.now())	
+		m.save()
 		
 		return render_to_response('FindTeammates/teams.html', context_instance=RequestContext(request))
 	else:
 		return render_to_response('FindTeammates/teams.html', context_instance=RequestContext(request))
+
+def accept_join(request):
+	print "here1"
+	user = request.user
+	current_student = Student.objects.all().get(user=user.id)
+	current_id = current_student.id
+	
+	if request.POST.has_key('client_response'):
+		messageID = request.POST['client_response']
+		message = Message.objects.all().get(id=messageID)
+		joiner = message.senderID
+		jointeam = message.teamID
+		existing_stu_team = student_team.objects.all().filter(studentID=joiner, teamID=jointeam)
+		current_team_members = student_team.objects.all().filter(teamID=jointeam)
+		current_course = jointeam.courseID
+		if len(existing_stu_team)>0 or len(current_team_members)>=current_course.groupSize:
+			message.delete()
+			return HttpResponse("success");
+		else:
+			stu_team = student_team(studentID=joiner, teamID=jointeam)
+			stu_team.save()
+			message.delete()
+			stu_team = student_team(studentID=joiner, teamID=jointeam)
+			return HttpResponse("success");
+	else:
+		return HttpResponse("error");
+
 
 def openTeam(request):
 	return render_to_response('FindTeammates/openTeam.html', context_instance=RequestContext(request))
@@ -387,44 +428,49 @@ def addNewTeam(request):
 	current_id = current_student.id
 	student_course_list = student_course.objects.filter(studentID=current_id)
 	courselist = Course.objects.all().filter(id__in=student_course_list.values('courseID'))
-	current_course_id = courselist[0].id
-
-
+	
 	team_name = request.POST.get("teamName", "")
 	description = request.POST.get("teamDescription", "")
-	teamSize = int(request.POST.get("teamSize", 4))
+	skills = request.POST.get("skills", "")
+	current_course_id = request.POST.get("courseID", "0")
+
 	stu = Student.objects.get(id=current_id)
 	course = Course.objects.get(id=current_course_id)
 
-	team = Team(teamName=team_name, teamDescription=description, Size=teamSize, ownerID=stu, courseID=course)
+	print current_course_id 
+	team = Team(teamName=team_name, teamDescription=description, Size=course.groupSize, ownerID=stu, courseID=course)
 	
 	team.save()
 	
 	stu_team = student_team(studentID=stu, teamID=team)
 	stu_team.save()
-	return teams(request)
+	
+	return teams(request, current_course_id)
 	#return render_to_response('FindTeammates/teams.html')
 
 def createCourse(request):
+	c = {}
+	c.update(csrf(request))
 	new_course = Course()
 
-	'''
-	if not request.user.is_authenticated():
-	    return redirect('login')
-	new_plan.holder = request.user
-	'''
-
-	#do validation
+	
 	new_course.University = request.POST.get('university', "")
 	new_course.courseName = request.POST.get('coursename', "")
-	new_course.depart_time = request.POST.get('semester', "")
+	new_course.semester = request.POST.get('semester', "").split(" ")[0]
+	season = request.POST.get('semester', "").split(" ")[1].lower().strip()
+	if season == "spring":
+		new_course.season = 1
+	elif season == "summer":
+		new_course.season = 2
+	else:
+		new_course.season = 3
 	new_course.Professor = request.POST.get('professor', "")
 	new_course.Capacity = request.POST.get('capacity', 50)
 	new_course.groupSize = request.POST.get('groupsize', 4)
 	new_course.courseDescription = ""
 
 	new_course.save()
-	return redirect("/FindTeammates/roster")
+	return render_to_response('FindTeammates/site.html', c)
 
 def registerCourse(request):
 	courseid = request.POST.get('choosecourse',"")
@@ -459,13 +505,29 @@ def team_detail(request, teamID):
 	student_course_list = student_course.objects.filter(studentID=current_id)
 	courselist = Course.objects.all().filter(id__in=student_course_list.values('courseID'))
 	all_courses = Course.objects.all().exclude(id__in=courselist.values('id'))
-	current_course_id = courselist[0].id
 
 	team = Team.objects.all().get(id=teamID)
 	stu_teams = student_team.objects.all().filter(teamID=teamID)
 	team_members = Student.objects.all().filter(id__in=stu_teams.values('studentID'))
 	template = loader.get_template('FindTeammates/team_detail.html')
-	context = RequestContext(request, {'team':team, 'team_members':team_members, 'courselist':courselist, 'all_courses':all_courses, 'current_course_id':current_course_id})
+	context = RequestContext(request, {'team':team, 'team_members':team_members, 'courselist':courselist, 'all_courses':all_courses})
+	return HttpResponse(template.render(context))
+
+def myTeams(request):
+	user = request.user
+	current_student = Student.objects.all().get(user=user.id)
+	current_id = current_student.id
+
+	student_course_list = student_course.objects.filter(studentID=current_id)
+	courselist = Course.objects.all().filter(id__in=student_course_list.values('courseID'))
+	all_courses = Course.objects.all().exclude(id__in=courselist.values('id'))
+
+	
+	stu_teams = student_team.objects.all().filter(studentID=current_id)
+	my_teams = Team.objects.all().filter(id__in=stu_teams.values('teamID'))
+	template = loader.get_template('FindTeammates/myTeams.html')
+	print my_teams
+	context = RequestContext(request, {'my_teams':my_teams, 'courselist':courselist, 'all_courses':all_courses})
 	return HttpResponse(template.render(context))
 
 
