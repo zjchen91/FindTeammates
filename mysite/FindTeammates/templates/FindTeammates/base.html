@@ -56,27 +56,32 @@
             <!-- Collect the nav links, forms, and other content for toggling -->
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav">
-                    <li>
 
-                        <a href="{% url 'roster' %}">Roster</a>
+                    <li class="dropdown">
+                    <a href="#" data-toggle="dropdown" class="dropdown-toggle">Roster <b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                        {% for course in courselist %}
+                    <li><a href="/FindTeammates/roster/{{course.id}}/">{{course.courseName}}</a></li>
+                    <li class="divider"></li>
+                        {% endfor %}
+                    </ul>
                     </li>
-                    <li>
-                        <a href="{% url 'teams' %}">Teams</a>
 
-                    </li>
+                    <li class="dropdown">
+                    <a href="#" data-toggle="dropdown" class="dropdown-toggle">Teams <b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                        {% for course in courselist %}
+                    <li><a href="/FindTeammates/teams/{{course.id}}/">{{course.courseName}}</a></li>
+                    <li class="divider"></li>
+                        {% endfor %}
+                    </ul>
+                     </li>
+
                     <li>
                         <a href="{% url 'showMessages' %}">Message</a>
                     </li>
-                    <li class="dropdown">
-                    <a href="#" data-toggle="dropdown" class="dropdown-toggle">My Courses <b class="caret"></b></a>
-                    <ul class="dropdown-menu">
-                        {% for course in courselist %}
-                    <li><a href="#">{{course.courseName}}</a></li>
-                    <li class="divider"></li>
-                        {% endfor %}
 
-                     </ul>
-                     </li>
+                
                      <li id="registercourse">
                         <a href="#" data-toggle="modal" data-target="#registerNewCourseModal"> Register New Course </a>
                     </li>

@@ -31,22 +31,33 @@
     <!-- Page Content -->
 <div class="container">
 
+    <div class="row jumbotron">
+      <h3><span class="label label-primary">Course Name</span>   {{current_course.courseName|rjust:"50"}} </h3>
+    <h3><span class="label label-warning">Semester</span>   {{current_course.semester}}{% if current_course.season == '1' %} Spring {% elif current_course.season == '2' %} Summer{% else %} Fall{% endif %}  </h3>
+             <h3><span class="label label-info">Professor</span>   {{current_course.Professor}} </h3>
+             <h3><span class="label label-success">University</span>   {{current_course.University|rjust:"10" }} </h3>
+             <h3><span class="label label-primary">Capacity</span>   {{current_course.Capacity}} </h3>
+             <h3><span class="label label-success">GroupSize</span>   {{current_course.groupSize}} </h3>
+             <h3><span class="label label-warning">Course Description</span> {{current_course.courseDescription}} </h3>
+    </div>
     <!-- Jumbotron Header -->
-    <header class="jumbotron hero-spacer">
+    {% ifequal in_team 0 %}
+    <header class="jumbotron">
             <button type="submit" class="btn btn-primary btn-large" onclick="window.location.href='../openteam'">Create a Team Now</button>
         </p>
     </header>
+    {% endifequal %}
 
     <hr>
 
 
     <!-- Page Features -->
-    <div class="row text-center">
+    <div class="row text-center ">
     {% if team_list.0 %}
         {% for team, rate in team_list %}
         <div class="col-md-4 col-sm-8 hero-feature">
             <div class="thumbnail">
-                <img src="../../static/FindTeammates/img/default_team_image.jpg" alt="">
+                <img src="../../../static/FindTeammates/img/default_team_image.jpg" alt="">
                 <div class="caption">
 
                     <h3 ><a href="/FindTeammates/team_detail/{{team.id}}/">{{ team.teamName }}</a></h3>

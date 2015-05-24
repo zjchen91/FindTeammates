@@ -27,7 +27,7 @@ BASE = os.path.dirname(os.path.abspath(__file__))
 
 
 
-def roster(request):
+def roster(request, courseID="0"):
 
 	template = loader.get_template('FindTeammates/roster.html')
 	user = request.user
@@ -43,7 +43,11 @@ def roster(request):
 		return HttpResponse(template.render(context))
 
 	else:
-		current_course_id = courselist[0].id
+		if courseID=="0":
+			current_course_id= courselist[0].id
+		else:
+			current_course_id = courseID
+		current_course = Course.objects.all().get(id=current_course_id)
 		current_course_teams = Team.objects.all().filter(courseID=current_course_id)
 		stpair = student_team.objects.all().filter(teamID__in=current_course_teams)
 		studentList = student_course.objects.all().filter(courseID=current_course_id)
@@ -74,14 +78,14 @@ def roster(request):
 				studentObjectList.append((Student.objects.get(id=int(item[0])), item[1]))
 
 			
-			context = RequestContext(request, {'student_list': studentObjectList, 'courselist':courselist, 'all_courses':all_courses, 'current_course_id':current_course_id, 'in_team':in_team})
+			context = RequestContext(request, {'student_list': studentObjectList, 'courselist':courselist, 'all_courses':all_courses, 'current_course_id':current_course_id, 'in_team':in_team, 'current_course':current_course})
 			return HttpResponse(template.render(context))
 		else:
 			studentObjectList = []
 			for s in studentList:
 				studentObjectList.append((s, 'N/A'))
 
-			context = RequestContext(request, {'student_list': studentObjectList, 'courselist':courselist, 'all_courses':all_courses, 'current_course_id':current_course_id, 'in_team':in_team})
+			context = RequestContext(request, {'student_list': studentObjectList, 'courselist':courselist, 'all_courses':all_courses, 'current_course_id':current_course_id, 'in_team':in_team, 'current_course':current_course})
 			return HttpResponse(template.render(context))
 
 
@@ -89,7 +93,7 @@ def site(request):
 	return render_to_response("FindTeammates/site.html")
 
 
-def teams(request):
+def teams(request, courseID="0"):
 
 	template = loader.get_template('FindTeammates/teams.html')
 	user = request.user
@@ -106,21 +110,27 @@ def teams(request):
 		return HttpResponse(template.render(context))
 
 	else:
-		current_course_id = courselist[0].id
+		if courseID=="0":
+			current_course_id= courselist[0].id
+		else:
+			current_course_id = courseID
+		current_course = Course.objects.all().get(id=current_course_id)
 		stpair = student_team.objects.all()
 		teamList = Team.objects.all().filter(courseID=current_course_id)
 		allteam = []
 		for team in teamList:
 			allteam.append(str(team.id))
 
+		in_team = 0
 		# in a team
 		if len(stpair.filter(studentID=current_id)) != 0:
+			in_team = 1
 			#print 'in a team'
 			#print current_id
 			teamObjectList = []
 			for s in teamList:
 				teamObjectList.append((s, 'N/A'))
-			context = RequestContext(request, {'team_list': teamObjectList,  'courselist':courselist, 'all_courses':all_courses,  'current_course_id':current_course_id})
+			context = RequestContext(request, {'team_list': teamObjectList,  'courselist':courselist, 'all_courses':all_courses,  'current_course_id':current_course_id, 'current_course':current_course, 'in_team':in_team})
 			return HttpResponse(template.render(context))
 		else:
 			#print 'alone'
@@ -139,7 +149,7 @@ def teams(request):
 			teamObjectList = []
 			for item in ranklist:
 				teamObjectList.append((Team.objects.get(id=int(item[0])), item[1]))
-			context = RequestContext(request, {'team_list': teamObjectList, 'courselist':courselist, 'all_courses':all_courses,  'current_course_id':current_course_id})
+			context = RequestContext(request, {'team_list': teamObjectList, 'courselist':courselist, 'all_courses':all_courses,  'current_course_id':current_course_id, 'current_course':current_course, 'in_team':in_team})
 			return HttpResponse(template.render(context))
 
 

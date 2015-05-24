@@ -3,9 +3,11 @@ from django.conf.urls import patterns, url
 from . import views
 
 urlpatterns = patterns('',
-    
-    url(r'^roster$', views.roster, name='roster'),
-    url(r'^teams/$', views.teams, name='teams'),
+
+    url(r'^roster/$', views.roster),
+    url(r'^roster/(?P<courseID>[0-9]+)/$', views.roster),
+    url(r'^teams/$', views.teams),
+    url(r'^teams/(?P<courseID>[0-9]+)/$', views.teams),
 	url(r'^site/$', views.site, name='site'),
     url(r'^login/$', views.site_login, name='login'),
     url(r'^callback/$', views.callback),
