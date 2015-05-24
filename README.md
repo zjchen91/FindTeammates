@@ -1,6 +1,4 @@
-# Project Name
-
-FindTeammates
+# FindTeammates
 
 ## Introduction
 
