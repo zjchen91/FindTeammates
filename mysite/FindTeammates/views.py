@@ -254,7 +254,9 @@ def site_login(request):
 
 
 def updateInviteHistory(request):
-	current_id = 17
+	user = request.user
+	current_student = Student.objects.all().get(user=user.id)
+	current_id = current_student.id
 	if request.POST.has_key('client_response'):
 		inviteeID = request.POST['client_response']
 		inviter = Student.objects.get(id=current_id)
@@ -267,7 +269,9 @@ def updateInviteHistory(request):
 		return render_to_response('FindTeammates/roster.html', context_instance=RequestContext(request))
 
 def updateJoinHistory(request):
-	current_id = 17
+	user = request.user
+	current_student = Student.objects.all().get(user=user.id)
+	current_id = current_student.id
 	if request.POST.has_key('client_response'):
 		jointeamID = request.POST['client_response']
 		print jointeamID
@@ -285,8 +289,13 @@ def openTeam(request):
 
 
 def addNewTeam(request):
-	current_id = 17
-	current_course_id = 1
+	user = request.user
+	current_student = Student.objects.all().get(user=user.id)
+	current_id = current_student.id
+	student_course_list = student_course.objects.filter(studentID=current_id)
+	courselist = Course.objects.all().filter(id__in=student_course_list.values('courseID'))
+	current_course_id = courselist[0].id
+
 
 	team_name = request.POST.get("teamName", "")
 	description = request.POST.get("teamDescription", "")
