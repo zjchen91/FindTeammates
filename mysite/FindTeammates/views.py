@@ -87,42 +87,53 @@ def site(request):
 
 
 def teams(request):
-	current_id = 17
-	current_course_id = 1
-	stpair = student_team.objects.all()
-	teamObjectList = Team.objects.all().filter(courseID=current_course_id)
-	allteam = []
-	for team in teamObjectList:
-		allteam.append(str(team.id))
+
 	template = loader.get_template('FindTeammates/teams.html')
-
+	user = request.user
+	current_student = Student.objects.all().get(user=user.id)
+	current_id = current_student.id
 	student_course_list = student_course.objects.filter(studentID=current_id)
-	courselist = []
-	for stu_co in student_course_list:
-		courselist.append(stu_co.courseID)
+	courselist = Course.objects.all().filter(id__in=student_course_list.values('courseID'))
+	all_courses = Course.objects.all().exclude(id__in=courselist.values('id'))
 
-	# in a team
-	if len(stpair.filter(studentID=current_id)) != 0:
-		context = RequestContext(request, {'team_list': teamObjectList,  'courselist':courselist})
+	
+	
+	if len(courselist)==0:
+		context = RequestContext(request, {'team_list': [], 'courselist':[], 'all_courses':all_courses})
 		return HttpResponse(template.render(context))
+
 	else:
-		preferteam = {}
-		joinHis = stuJoinTeamHistory.objects.all()
-		for join in joinHis:
-			ner = str(join.joinerID.id)
-			nee = str(join.joineeTeamID.id)
-			if ner in preferteam:
-				preferteam[ner].append(nee)
-			else:
-				preferteam[ner] = [nee]
-		print preferteam
-		test = recommander(str(current_id), 'team', preferteam, allteam)
-		ranklist = test.run()
-		studentObjectList = []
-		for item in ranklist:
-			teamObjectList.append(Team.objects.get(id=int(item)))
-		context = RequestContext(request, {'team_list': teamObjectList, 'courselist':courselist})
-		return HttpResponse(template.render(context))
+		current_course_id = courselist[0].id
+		stpair = student_team.objects.all()
+		teamList = Team.objects.all().filter(courseID=current_course_id)
+		allteam = []
+		for team in teamList:
+			allteam.append(str(team.id))
+
+		# in a team
+		if len(stpair.filter(studentID=current_id)) != 0:
+			teamObjectList = []
+			for s in teamList:
+				teamObjectList.append((s, 'N/A'))
+			context = RequestContext(request, {'team_list': teamObjectList,  'courselist':courselist, 'all_courses':all_courses})
+			return HttpResponse(template.render(context))
+		else:
+			preferteam = {}
+			joinHis = stuJoinTeamHistory.objects.all()
+			for join in joinHis:
+				ner = str(join.joinerID.id)
+				nee = str(join.joineeTeamID.id)
+				if ner in preferteam:
+					preferteam[ner].append(nee)
+				else:
+					preferteam[ner] = [nee]
+			test = recommander(str(current_id), 'team', preferteam, allteam)
+			ranklist = test.run()
+			teamObjectList = []
+			for item in ranklist:
+				teamObjectList.append((Team.objects.get(id=int(item[0])), item[1]))
+			context = RequestContext(request, {'team_list': teamObjectList, 'courselist':courselist, 'all_courses':all_courses})
+			return HttpResponse(template.render(context))
 
 
 # From Enrui, New listening subAddress

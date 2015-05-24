@@ -150,7 +150,8 @@ class recommander:
 		for item in self.alldata:
 			if (item not in ranklist) and (item != self.userID):
 				rank.append((item, 0))
-		rank = normalize(rank)
+		if rank:
+			rank = normalize(rank)
 		return rank
 
 	def run(self):

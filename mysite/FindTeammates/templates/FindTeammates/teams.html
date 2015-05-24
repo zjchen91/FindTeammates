@@ -53,13 +53,15 @@
     <!-- Page Features -->
     <div class="row text-center">
     {% if team_list.0 %}
-        {% for team in team_list %}
+        {% for team, rate in team_list %}
         <div class="col-md-3 col-sm-6 hero-feature">
             <div class="thumbnail">
                 <img src="http://placehold.it/800x500" alt="">
                 <div class="caption">
                     <h3>{{ team.teamName }}</h3>
+                    <h4> recommended rate: {{rate}}</h4>
                     <p>{{ team.teamDescription }}</p>
+
                     <form method="post" name="" >
                         {% csrf_token %}
                         <input id={{ team.id }} name="join" type="button" class="btn btn-primary btn-large" value="Join!"></input>
