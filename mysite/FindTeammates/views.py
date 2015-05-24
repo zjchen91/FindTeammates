@@ -405,14 +405,43 @@ def accept_join(request):
 		existing_stu_team = student_team.objects.all().filter(studentID=joiner, teamID=jointeam)
 		current_team_members = student_team.objects.all().filter(teamID=jointeam)
 		current_course = jointeam.courseID
-		if len(existing_stu_team)>0 or len(current_team_members)>=current_course.groupSize:
+		all_teams_in_current_course = Team.objects.all().filter(courseID=current_course)
+		in_team_already = student_team.objects.all().filter(studentID=joiner, teamID__in=all_teams_in_current_course.values('id'))
+		if len(existing_stu_team)>0 or len(current_team_members)>=current_course.groupSize or len(in_team_already)>0:
 			message.delete()
 			return HttpResponse("success");
 		else:
 			stu_team = student_team(studentID=joiner, teamID=jointeam)
 			stu_team.save()
 			message.delete()
-			stu_team = student_team(studentID=joiner, teamID=jointeam)
+			return HttpResponse("success");
+	else:
+		return HttpResponse("error");
+
+def accept_invite(request):
+	user = request.user
+	current_student = Student.objects.all().get(user=user.id)
+	current_id = current_student.id
+	
+	if request.POST.has_key('client_response'):
+		messageID = request.POST['client_response']
+		message = Message.objects.all().get(id=messageID)
+		inviter = message.senderID
+		invitee = message.receiverID
+		team = message.teamID
+
+		existing_stu_team = student_team.objects.all().filter(studentID=invitee, teamID=team)
+		current_team_members = student_team.objects.all().filter(teamID=team)
+		current_course = team.courseID
+		all_teams_in_current_course = Team.objects.all().filter(courseID=current_course)
+		in_team_already = student_team.objects.all().filter(studentID=invitee, teamID__in=all_teams_in_current_course.values('id'))
+		if len(existing_stu_team)>0 or len(current_team_members)>=current_course.groupSize or len(in_team_already)>0:
+			message.delete()
+			return HttpResponse("success");
+		else:
+			stu_team = student_team(studentID=invitee, teamID=team)
+			stu_team.save()
+			message.delete()
 			return HttpResponse("success");
 	else:
 		return HttpResponse("error");
