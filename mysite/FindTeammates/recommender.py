@@ -143,13 +143,15 @@ class recommander:
 			rank[user] += self.rankOT[user]
 		'''
 		rank = sorted(rank.items(),key=lambda x:x[1],reverse=True)
+
 		ranklist = []
 		for item in rank:
 			ranklist.append(item[0])
 		for item in self.alldata:
 			if (item not in ranklist) and (item != self.userID):
-				ranklist.append(item)
-		return ranklist
+				rank.append((item, 0))
+		rank = normalize(rank)
+		return rank
 
 	def run(self):
 		self.itemBasedCF()

@@ -45,10 +45,10 @@ def roster(request):
 		current_course_id = courselist[0].id
 		current_course_teams = Team.objects.all().filter(courseID=current_course_id)
 		stpair = student_team.objects.all().filter(teamID__in=current_course_teams)
-		studentObjectList = student_course.objects.all().filter(courseID=current_course_id)
+		studentList = student_course.objects.all().filter(courseID=current_course_id)
 
 		alluser = []
-		for stu in studentObjectList:
+		for stu in studentList:
 			alluser.append(str(stu.studentID.id))
 	
 		# see whether current user is in a team or not
@@ -68,20 +68,16 @@ def roster(request):
 			ranklist = test.run()
 			studentObjectList = []
 			for item in ranklist:
-				studentObjectList.append(Student.objects.get(id=int(item)))
+				studentObjectList.append((Student.objects.get(id=int(item[0])), item[1]))
 
-			# just for test
-			test = student_course.objects.all().filter(courseID=current_course_id)
-			studentObjectList = Student.objects.all().filter(id__in=test.values('studentID'))
 			
 			context = RequestContext(request, {'student_list': studentObjectList, 'courselist':courselist, 'all_courses':all_courses})
 			return HttpResponse(template.render(context))
 		else:
+			studentObjectList = []
+			for s in studentList:
+				studentObjectList.append((s, 'N/A'))
 
-			# just for test
-			test = student_course.objects.all().filter(courseID=current_course_id)
-			studentObjectList = Student.objects.all().filter(id__in=test.values('studentID'))
-			
 			context = RequestContext(request, {'student_list': studentObjectList, 'courselist':courselist, 'all_courses':all_courses})
 			return HttpResponse(template.render(context))
 
