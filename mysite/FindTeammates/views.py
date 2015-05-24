@@ -26,6 +26,7 @@ RETURN_URL = addr+ callback_postfix
 BASE = os.path.dirname(os.path.abspath(__file__))
 
 
+
 def roster(request):
 
 	template = loader.get_template('FindTeammates/roster.html')
@@ -52,11 +53,11 @@ def roster(request):
 			alluser.append(str(stu.studentID.id))
 	
 		# see whether current user is in a team or not
-		in_team = 0
+
 		# in a team
+		in_team = 0
 		if len(stpair.filter(studentID=current_id)) != 0:
 			in_team = 1
-
 			preferuser = {}
 			inviteHis = teamInviteStuHistory.objects.all()
 			for invite in inviteHis:
@@ -77,9 +78,9 @@ def roster(request):
 			return HttpResponse(template.render(context))
 		else:
 			studentObjectList = []
-			all_students = Student.objects.all().filter(id__in=studentList.values('studentID')).exclude(id=current_id)
-			for s in all_students:
+			for s in studentList:
 				studentObjectList.append((s, 'N/A'))
+
 			context = RequestContext(request, {'student_list': studentObjectList, 'courselist':courselist, 'all_courses':all_courses, 'current_course_id':current_course_id, 'in_team':in_team})
 			return HttpResponse(template.render(context))
 
