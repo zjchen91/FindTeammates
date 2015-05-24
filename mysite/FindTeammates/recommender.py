@@ -130,9 +130,12 @@ class recommander:
 
 	def recommend(self):
 		rank = {}
+		maxRate = 0
 		for user in self.rankCF:
 			rank.setdefault(user, 0)
 			rank[user] += self.rankCF[user]
+			if rank[user] > maxRate:
+				maxRate = rank[user]
 		'''
 		for user in self.rankSS:
 			rank.setdefault(user, 0)
@@ -153,8 +156,13 @@ class recommander:
 
 		
 		if rank:
-			rank = normalize(rank)
-		print rank
+			if maxRate == 0:
+				for item in rank:
+					rank[item] = 100
+			else:
+				for item in rank:
+					rank[item] /= maxRate
+
 		rank = sorted(rank.items(),key=lambda x:x[1],reverse=True)
 		return rank
 
