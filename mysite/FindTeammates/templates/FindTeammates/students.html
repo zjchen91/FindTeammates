@@ -9,7 +9,8 @@
                 dataType: "json", 
                 data : {
                     client_response : this.id,
-                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                    csrfmiddlewaretoken: '{{ csrf_token }}',
+                    current_course_id: '{{ current_course_id }}' 
                     },
                     success : function(json) {
                         alert("success");

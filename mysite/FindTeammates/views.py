@@ -70,7 +70,7 @@ def roster(request):
 			test = student_course.objects.all().filter(courseID=current_course_id)
 			studentObjectList = Student.objects.all().filter(id__in=test.values('studentID'))
 			
-			context = RequestContext(request, {'student_list': studentObjectList, 'courselist':courselist, 'all_courses':all_courses})
+			context = RequestContext(request, {'student_list': studentObjectList, 'courselist':courselist, 'all_courses':all_courses, 'current_course_id':current_course_id})
 			return HttpResponse(template.render(context))
 		else:
 
@@ -78,7 +78,7 @@ def roster(request):
 			test = student_course.objects.all().filter(courseID=current_course_id)
 			studentObjectList = Student.objects.all().filter(id__in=test.values('studentID'))
 			
-			context = RequestContext(request, {'student_list': studentObjectList, 'courselist':courselist, 'all_courses':all_courses})
+			context = RequestContext(request, {'student_list': studentObjectList, 'courselist':courselist, 'all_courses':all_courses, 'current_course_id':current_course_id})
 			return HttpResponse(template.render(context))
 
 
@@ -243,13 +243,29 @@ def site_login(request):
 
 
 def updateInviteHistory(request):
-	current_id = 17
+	user = request.user
+	current_student = Student.objects.all().get(user=user.id)
+	current_id = current_student.id
+	print "in updateInviteHistory"
 	if request.POST.has_key('client_response'):
 		inviteeID = request.POST['client_response']
 		inviter = Student.objects.get(id=current_id)
 		invitee = Student.objects.get(id=inviteeID)
 		his = teamInviteStuHistory(inviterID=inviter, inviteeID=invitee)
 		his.save()
+		current_course_id = request.POST['current_course_id']
+		print "current_course_id"
+		print current_course_id
+		
+		all_teams_in_current_course = Team.objects.all().filter(courseID=current_course_id)
+		inviter_team = student_team.objects.all().filter(studentID=inviter).filter(teamID__in=all_teams_in_current_course.values('id'))
+		if not len(inviter_team)==1:
+			print "heere1"
+			return None
+		else:
+			print "heere2"
+			message = Message(senderID=inviter, receiverID=invitee, messageType=5, messageStatus=0, content="", teamID=inviter_team[0], date=datetime.datetime.now())
+			message.save()
 		
 		return render_to_response('FindTeammates/roster.html', context_instance=RequestContext(request))
 	else:
