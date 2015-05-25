@@ -1,6 +1,10 @@
 {% extends "FindTeammates/base.html" %}
 
 {% block content %}
+<link href='http://fonts.googleapis.com/css?family=Oswald:400,700' rel='stylesheet' type='text/css'>
+<link href='http://fonts.googleapis.com/css?family=PT+Sans+Caption:700' rel='stylesheet' type='text/css'>
+<link href='http://fonts.googleapis.com/css?family=Raleway' rel='stylesheet' type='text/css'>
+<link href='http://fonts.googleapis.com/css?family=Montserrat:700' rel='stylesheet' type='text/css'>
 
  <script type="text/javascript">
     $(document).ready(function() {
@@ -31,14 +35,29 @@
 <div class="container">
 
     <div class="row jumbotron">
-      <h3><span class="label label-primary">Course Name</span>   {{current_course.courseName|rjust:"50"}} </h3>
-    <h3><span class="label label-warning">Semester</span>   {{current_course.semester}}{% if current_course.season == '1' %} Spring {% elif current_course.season == '2' %} Summer{% else %} Fall{% endif %}  </h3>
-             <h3><span class="label label-info">Professor</span>   {{current_course.Professor}} </h3>
-             <h3><span class="label label-success">University</span>   {{current_course.University|rjust:"10" }} </h3>
-             <h3><span class="label label-primary">Capacity</span>   {{current_course.Capacity}} </h3>
-             <h3><span class="label label-success">GroupSize</span>   {{current_course.groupSize}} </h3>
-             <h3><span class="label label-warning">Course Description</span> {{current_course.courseDescription}} </h3>
+<div>
+<span style="font-family: 'Raleway', sans-serif; font-size:30px" >Course Name</span>  &nbsp;&nbsp;&nbsp;<span style="font-family:'Oswald', sans-serif; font-size:30px; color:#835930">  {{current_course.courseName|rjust:"50"}} </span> 
+</div>
+<div>
+<span style="font-family: 'Raleway', sans-serif; font-size:30px">Semester</span>  &nbsp;&nbsp;&nbsp; <span style="font-family:'Oswald', sans-serif; font-size:30px; color:#835930"> {{current_course.semester}}{% if current_course.season == '1' %} Spring {% elif current_course.season == '2' %} Summer{% else %} Fall{% endif %}  </span> 
+</div>
+<div>
+             <span style="font-family: 'Raleway', sans-serif; font-size:30px">Professor</span>  &nbsp;&nbsp;&nbsp;<span style="font-family:'Oswald', sans-serif; font-size:30px; color:#835930">  {{current_course.Professor}} </span> 
+             </div>
+<div>
+             <span style="font-family: 'Raleway', sans-serif; font-size:30px">University</span>  &nbsp;&nbsp;&nbsp; <span style="font-family:'Oswald', sans-serif; font-size:30px; color:#835930"> {{current_course.University|rjust:"10" }} </span> 
+             </div>
+<div>
+             <span style="font-family: 'Raleway', sans-serif; font-size:30px">Capacity</span>  &nbsp;&nbsp;&nbsp; <span style="font-family:'Oswald', sans-serif; font-size:30px; color:#835930"> {{current_course.Capacity}} </span> 
+             </div>
+<div>
+             <span style="font-family: 'Raleway', sans-serif; font-size:30px">GroupSize</span>  &nbsp;&nbsp;&nbsp; <span style="font-family:'Oswald', sans-serif; font-size:30px; color:#835930"> {{current_course.groupSize}} </span> 
+             </div>
+<div>
+             <span style="font-family: 'Raleway', sans-serif; font-size:30px">Course Description</span>  &nbsp;&nbsp;&nbsp;<span style="font-family:'Oswald', sans-serif; font-size:30px; color:#835930">{{current_course.courseDescription}} </span> 
+             </div>
     </div>
+    
     <!-- Jumbotron Header -->
     {% ifequal in_team 0 %}
     <header class="jumbotron">
@@ -59,8 +78,8 @@
                 <img src="../../../static/FindTeammates/img/default_team_image.jpg" alt="">
                 <div class="caption">
 
-                    <h3 ><a href="/FindTeammates/team_detail/{{team.id}}/">{{ team.teamName }}</a></h3>
-                    <h4 > Team Leader: {{team.ownerID.name}}</h4>
+                    <h3 style="font-family: 'Montserrat', sans-serif;"><a href="/FindTeammates/team_detail/{{team.id}}/">{{ team.teamName }}</a></h3>
+                    <h4 style="font-family: 'Montserrat', sans-serif;"> Team Leader: {{team.ownerID.name}}</h4>
                     
                     {% if rate != "N/A" %}
                     <h4> recommended rate: {{rate}}</h4>
