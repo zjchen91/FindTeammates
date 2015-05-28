@@ -35,3 +35,6 @@ Then copy url http://127.0.0.1:8000/FindTeammates/site to your browser.
 
 ## report
 https://docs.google.com/document/d/11181YIL8GaldXSIftBmyihlyhqbozhx8Y3zwSJRSYwQ/edit
+
+## slides
+https://docs.google.com/presentation/d/1sdxGRtr50zX_zrQEstsZ2uxC0-H8Kun5O4u7GrJsnas/edit
