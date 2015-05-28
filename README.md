@@ -33,3 +33,5 @@ Then copy url http://127.0.0.1:8000/FindTeammates/site to your browser.
 3. Zhejiao Chen: zc2291@columbia.edu
 4. Enrui Liao: el2756@columbia.edu
 
+## report
+https://docs.google.com/document/d/11181YIL8GaldXSIftBmyihlyhqbozhx8Y3zwSJRSYwQ/edit
